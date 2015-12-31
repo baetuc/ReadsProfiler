@@ -1,6 +1,7 @@
 #include "Creation.h"
 #include <string>
 #include <list>
+#pragma once
 
 using namespace std;
 
@@ -10,7 +11,7 @@ private:
     string ISBN;
     string publisher;
     unsigned int publicationYear;
-    double rating;
+    float rating;
     string path;
 
 public:
@@ -18,13 +19,13 @@ public:
     string getISBN() {return ISBN;}
     string getPublisher() {return publisher;}
     unsigned int getPublicationYear() {return publicationYear;}
-    double getRating() {return rating;}
+    float getRating() {return rating;}
     string getPath() {return path;}
 
-    void setCreation(Creation creation) {this.creation = creation;}
-    void setISBN(string ISBN) {this.ISBN = ISBN;}
-    void setPublisher(string publisher) {this.publisher = publisher;}
-    void setPublicationYear(unsigned int publicationYear) {this.publicationYear = publicationYear;}
-    void setRating(double rating) {this.rating = rating;}
-    void setPath(string path) {this.path = path;}
-}
+    void setCreation(Creation creation) {this->creation = creation;}
+    void setISBN(string ISBN) {this->ISBN = ISBN;}
+    void setPublisher(string publisher) {this->publisher = publisher;}
+    void setPublicationYear(unsigned int publicationYear) {this->publicationYear = publicationYear;}
+    void setRating(float rating) {this->rating = rating;}
+    void setPath(string path) {this->path = path;}
+};

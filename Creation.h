@@ -1,5 +1,6 @@
 #include "Author.h"
 #include <string>
+#include <list>
 #pragma once
 
 using namespace std;
@@ -19,9 +20,9 @@ public:
     list<string> getGenres() {return genres;}
     list<string> getSubgenres() {return subgenres;}
 
-    void setTitle(string title) {this.title = title;}
-    void setVolume(unsigned int volume) {this.volume = volume;}
-    void setAuthors(list<Author> authors) {this.authors = authors;}
-    void setGenres(list<string> genres) {this.genres = genres;}
-    void setSubgenres(list<string> subgenres) {this.setSubgenres = subgenres;}
-}
+    void setTitle(string title) {this->title = title;}
+    void setVolume(unsigned int volume) {this->volume = volume;}
+    void setAuthors(list<Author> authors) {this->authors = authors;}
+    void setGenres(list<string> genres) {this->genres = genres;}
+    void setSubgenres(list<string> subgenres) {this->subgenres = subgenres;}
+};
