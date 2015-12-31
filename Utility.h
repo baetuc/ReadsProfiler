@@ -16,8 +16,8 @@ public:
 
 // Method that transforms an int to a string
 string Utility::getStringForNumber(int number) {
-    char length[4];
-    snprintf(length, 4, "%d", number);
+    char length[5];
+    snprintf(length, 5, "%d", number);
     string response(length);
     return response;
 }

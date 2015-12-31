@@ -9,6 +9,7 @@
 #include <list>
 #include <stdlib.h>
 #include "Utility.h"
+#include <iostream>
 
 using namespace std;
 
@@ -91,7 +92,7 @@ Creation SerializerDeserializer::deserializeCreation(string serializedCreation) 
     int titleLength = atoi(substrings[0].c_str());
     current = substrings[1];
     creation.setTitle(current.substr(0, titleLength));
-    current = current.substr(titleLength - 1, string::npos);
+    current = current.substr(titleLength, string::npos);
 
     // Now, we have to split by comma, to find out the volume
     substrings = Utility::splitString(current, ',', 2);
@@ -175,13 +176,13 @@ Book SerializerDeserializer::deserializeBook(string serializedBook) {
     substrings = Utility::splitString(current, ',', 2);
     int substringLength = atoi(substrings[0].c_str());
     book.setISBN(substrings[1].substr(0, substringLength));
-    current = substrings[1].substr(substringLength - 1, string::npos);
+    current = substrings[1].substr(substringLength, string::npos);
 
     // Split by comma, to get the length of publisher
     substrings = Utility::splitString(current, ',', 2);
     substringLength = atoi(substrings[0].c_str());
     book.setPublisher(substrings[1].substr(0, substringLength));
-    current = substrings[1].substr(substringLength - 1, string::npos);
+    current = substrings[1].substr(substringLength, string::npos);
 
     // Get the publication year
     substrings = Utility::splitString(current, ',', 2);
