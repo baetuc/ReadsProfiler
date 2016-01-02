@@ -40,7 +40,6 @@ int main() {
     book.setPublisher("Tabitha");
     book.setPublicationYear(2005);
     book.setRating(9.34);
-    book.setPath("/home/cip/AllBooks/BestBookEver.txt");
 
     string serializedBook;
     serializedBook = serializer.serializeBook(book);
@@ -75,5 +74,4 @@ int main() {
     cout << "Publisher: " << otherBook.getPublisher() << '\n';
     cout << "Aparition year: " << otherBook.getPublicationYear() << '\n';
     cout << "Rating: " << otherBook.getRating() << '\n';
-    cout << "Path: " << otherBook.getPath() << '\n';
 }

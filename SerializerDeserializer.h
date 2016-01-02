@@ -154,11 +154,6 @@ string SerializerDeserializer::serializeBook(Book book) {
     serializedBook += ',';
 
     serializedBook += Utility::getStringForFloat(book.getRating());
-    serializedBook += ',';
-
-    serializedBook += Utility::getStringForNumber((int) book.getPath().size());
-    serializedBook += ',';
-    serializedBook += book.getPath();
 
     return serializedBook;
 }
@@ -190,14 +185,7 @@ Book SerializerDeserializer::deserializeBook(string serializedBook) {
     current = substrings[1];
 
     // Get the rating
-    substrings = Utility::splitString(current, ',', 2);
-    book.setRating((float)atof(substrings[0].c_str()));
-    current = substrings[1];
-
-    // Get the path
-    substrings = Utility::splitString(current, ',', 2);
-    substringLength = atoi(substrings[0].c_str());
-    book.setPath(substrings[1].substr(0, substringLength));
+    book.setRating((float)atof(current.c_str()));
 
     return book;
 }
