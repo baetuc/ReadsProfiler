@@ -4,9 +4,11 @@
 */
 
 #include <string>
+#include <cstring>
 #include <iostream>
 #include <list>
-#include <sqlite3.h>
+#include "sqlite3.h"
+#include <stdlib.h>
 #include "Book.h"
 #include "Author.h"
 #include "Creation.h"
@@ -29,13 +31,13 @@ private:
     static string getStatementForSubgenres(Creation creation, bool& addedSomething);
 
     static string getStatementForISBN(Book query);
-    static list<string> getISBNForBooksThatMatchTheQuery(Book query);
+    static list<string> getISBNForBooksThatMatchTheQuery(Book query, sqlite3* database);
     static string getStringFromISBN(string ISBN, sqlite3* database, string field);
     static int getIntFromISBN(string ISBN, sqlite3* database, string field);
     static double getDoubleFromISBN(string ISBN, sqlite3* database, string field);
     static list<string> getListOfStringFromISBN(string ISBN, sqlite3* database, string field);
-    static list<Author> getAuthorsFromISBN(string ISBN, sqlite3* database, string field);
-    static Book getBookFromISBN(string ISBN);
+    static list<Author> getAuthorsFromISBN(string ISBN, sqlite3* database);
+    static Book getBookFromISBN(string ISBN, sqlite3* database);
 
 public:
     static list<Book> getResponseToQuery(Book query);
@@ -144,7 +146,7 @@ string DatabaseQueries::getStatementForSubgenres(Creation creation, bool& addedS
 /* First we will select the ISBNs of the books that match the
     query. */
 string DatabaseQueries::getStatementForISBN(Book query) {
-    string statement = "select distinct ISBN from previewInformation ";
+    string statement = "select distinct isbn from previewInformation ";
     bool addedSomething = false;
     Creation creation = query.getCreation();
 
@@ -159,21 +161,22 @@ string DatabaseQueries::getStatementForISBN(Book query) {
 
 // Returns the ISBN of all the books that match the query
 list<string> DatabaseQueries::getISBNForBooksThatMatchTheQuery(Book query, sqlite3* database) {
-    char* statement = 0;
     int response;
-
     /* Create SQL statement */
-    statement = getISBNForQuery(query).c_str();
+    string ISBNStatement = getStatementForISBN(query);
+    char* statement = new char[ISBNStatement.length() + 1];
+    strcpy(statement, ISBNStatement.c_str());
+    //statement = "select distinct isbn from previewInformation  where  volume = 1;";
 
     list<string> ISBNs;
     sqlite3_stmt *stmt;
-    result = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
-    if (result != SQLITE_OK) {
-        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT failed BOOKS THAT MATCH: " << sqlite3_errmsg(database) << '\n';
         exit(0); // TODO: think about throw?
     }
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        const char* ISBN = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        char* ISBN = (char*)(sqlite3_column_text(stmt, 0));
         ISBNs.push_back(string(ISBN));
     }
     sqlite3_finalize(stmt);
@@ -181,32 +184,48 @@ list<string> DatabaseQueries::getISBNForBooksThatMatchTheQuery(Book query, sqlit
 }
 
 string DatabaseQueries::getStringFromISBN(string ISBN, sqlite3* database, string field) {
-    char* statement = "select distinct " << field << " from previewInformation where ISBN='" << ISBN << "';";
+    const char* statement;
+    string statementString = "select distinct ";
+    statementString += field;
+    statementString += " from previewInformation where ISBN='";
+    statementString += ISBN;
+    statementString += "';";
+    statement = statementString.c_str();
     int response;
     sqlite3_stmt *stmt;
-    result = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
-    if (result != SQLITE_OK) {
-        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT failed STRING FROM: " << sqlite3_errmsg(database) << '\n';
         exit(0); // TODO: think about throw?
     }
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        const char* result = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+    string resultInString;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        char* result = (char*)(sqlite3_column_text(stmt, 0));
+        int length = sqlite3_column_bytes(stmt, 0);
+        resultInString.assign(result, length);
     }
     sqlite3_finalize(stmt);
-    return string(result);
+    return resultInString;
 }
 
 int DatabaseQueries::getIntFromISBN(string ISBN, sqlite3* database, string field) {
-    char* statement = "select distinct " << field << " from previewInformation where ISBN='" << ISBN << "';";
+    const char* statement;
+    string statementString = "select distinct ";
+    statementString += field;
+    statementString += " from previewInformation where ISBN='";
+    statementString += ISBN;
+    statementString += "';";
+    statement = statementString.c_str();
     int response;
     sqlite3_stmt *stmt;
-    result = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
-    if (result != SQLITE_OK) {
-        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT failed INT: " << sqlite3_errmsg(database) << '\n';
         exit(0); // TODO: think about throw?
     }
+    int result;
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int result = sqlite3_column_int(stmt, 0);
+        result = sqlite3_column_int(stmt, 0);
     }
     sqlite3_finalize(stmt);
     return result;
@@ -216,17 +235,21 @@ list<Author> DatabaseQueries::getAuthorsFromISBN(string ISBN, sqlite3* database)
     list<Author> authors;
     Author author;
 
-    char* statement = "select firstName, secondName from previewInformation where ISBN='" << ISBN << "';";
+    const char* statement;
+    string statementString = "select firstName, secondName from previewInformation where ISBN='";
+    statementString += ISBN;
+    statementString += "';";
+    statement = statementString.c_str();
     int response;
     sqlite3_stmt *stmt;
-    result = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
-    if (result != SQLITE_OK) {
-        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT failed AUTHORS: " << sqlite3_errmsg(database) << '\n';
         exit(0); // TODO: think about throw?
     }
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        const char* firstName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-        const char* secondName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        char* firstName = (char*)(sqlite3_column_text(stmt, 0));
+        char* secondName = (char*)(sqlite3_column_text(stmt, 1));
         author.setFirstName(string(firstName));
         author.setSecondName(string(secondName));
         authors.push_back(author);
@@ -235,18 +258,25 @@ list<Author> DatabaseQueries::getAuthorsFromISBN(string ISBN, sqlite3* database)
     return authors;
 }
 
-string DatabaseQueries::getListOfStringFromISBN(string ISBN, sqlite3* database, string field) {
-    char* statement = "select distinct " << field << " from previewInformation where ISBN='" << ISBN << "';";
+list<string> DatabaseQueries::getListOfStringFromISBN(string ISBN, sqlite3* database, string field) {
+    const char* statement;
+    string statementString = "select distinct ";
+    statementString += field;
+    statementString += " from previewInformation where ISBN='";
+    statementString += ISBN;
+    statementString += "';";
+    statement = statementString.c_str();
     int response;
     sqlite3_stmt *stmt;
     list<string> result;
-    result = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
-    if (result != SQLITE_OK) {
-        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT failed LIST STRING: " << sqlite3_errmsg(database) << '\n';
         exit(0); // TODO: think about throw?
     }
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        const char* line = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        char* line = (char*)(sqlite3_column_text(stmt, 0));
+        string resultt(line);
         result.push_back(string(line));
     }
     sqlite3_finalize(stmt);
@@ -254,16 +284,23 @@ string DatabaseQueries::getListOfStringFromISBN(string ISBN, sqlite3* database, 
 }
 
 double DatabaseQueries::getDoubleFromISBN(string ISBN, sqlite3* database, string field) {
-    char* statement = "select distinct " << field << " from previewInformation where ISBN='" << ISBN << "';";
+    const char* statement;
+    string statementString = "select distinct ";
+    statementString += field;
+    statementString += " from previewInformation where ISBN='";
+    statementString += ISBN;
+    statementString += "';";
+    statement = statementString.c_str();
     int response;
     sqlite3_stmt *stmt;
-    result = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
-    if (result != SQLITE_OK) {
-        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
+    double result;
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT failed FLOAT: " << sqlite3_errmsg(database) << '\n';
         exit(0); // TODO: think about throw?
     }
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        double result = sqlite3_column_double(stmt, 0);
+        result = sqlite3_column_double(stmt, 0);
     }
     sqlite3_finalize(stmt);
     return result;
@@ -277,7 +314,6 @@ Book DatabaseQueries::getBookFromISBN(string ISBN, sqlite3* database) {
     creation.setAuthors(getAuthorsFromISBN(ISBN, database));
     creation.setGenres(getListOfStringFromISBN(ISBN, database, "genre"));
     creation.setSubgenres(getListOfStringFromISBN(ISBN, database, "subgenre"));
-
     book.setCreation(creation);
 
     book.setISBN(ISBN);
@@ -290,7 +326,6 @@ Book DatabaseQueries::getBookFromISBN(string ISBN, sqlite3* database) {
 
 list<Book> DatabaseQueries::getResponseToQuery(Book query) {
     sqlite3* database;
-    char* statement = 0;
     int response;
 
     /* Open database */
@@ -304,7 +339,7 @@ list<Book> DatabaseQueries::getResponseToQuery(Book query) {
     list<string> ISBNs = getISBNForBooksThatMatchTheQuery(query, database);
     list<Book> result;
     for(list<string>::iterator it = ISBNs.begin(); it != ISBNs.end(); ++it) {
-        result.push_back(getBookFromISBN(*it));
+        result.push_back(getBookFromISBN(*it, database));
     }
 
     sqlite3_close(database);
