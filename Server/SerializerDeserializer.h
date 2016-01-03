@@ -3,25 +3,33 @@
     Date: 31 Dec 2015
 */
 
-#include "Book.h"
 #include <string>
 #include <vector>
 #include <list>
 #include <stdlib.h>
-#include "Utility.h"
 #include <iostream>
+#include "Book.h"
+#include "User.h"
+#include "Rating.h"
+#include "Utility.h"
 
 using namespace std;
 
 class SerializerDeserializer {
 private:
-    string serializeCreation(Creation);
-    string serializeAuthor(Author);
-    Creation deserializeCreation(string);
-    Author deserializeAuthor(string);
+    static string serializeCreation(Creation);
+    static string serializeAuthor(Author);
+    static Creation deserializeCreation(string);
+    static Author deserializeAuthor(string);
 public:
-    string serializeBook(Book);
-    Book deserializeBook(string);
+    static string serializeBook(Book);
+    static Book deserializeBook(string);
+    static string serializeBookList(list<Book>);
+    static list<Book> deserializeBookList(string);
+    static string serializeUser(User);
+    static User deserializeUser(string);
+    static string serializeRating(Rating);
+    static Rating deserializeRating(string);
 };
 
 string SerializerDeserializer::serializeAuthor(Author author) {
@@ -188,4 +196,61 @@ Book SerializerDeserializer::deserializeBook(string serializedBook) {
     book.setRating((float)atof(current.c_str()));
 
     return book;
+}
+
+string SerializerDeserializer::serializeBookList(list<Book> books) {
+    string result;
+    result += Utility::getStringForNumber(books.size());
+    result += ",";
+    for(list<Book>::iterator it = books.begin(); it != books.end(); ++it) {
+        result += serializeBook(*it);
+        result += "`";
+    }
+    return result;
+}
+
+list<Book> SerializerDeserializer::deserializeBookList(string serializedBooks) {
+    list<Book> result;
+    string current;
+    vector<string> substrings = Utility::splitString(serializedBooks, ',', 2);
+    int listSize = atoi(substrings[0].c_str());
+    current = substrings[1];
+    substrings = Utility::splitString(current, '`', listSize);
+    for(int i = 0; i < listSize; ++i) {
+        result.push_back(deserializeBook(substrings[i]));
+    }
+    return result;
+}
+
+string SerializerDeserializer::serializeUser(User user) {
+    string serializedUser = user.getUsername();
+    serializedUser += "#";
+    serializedUser += user.getPassword();
+    return serializedUser;
+}
+
+User SerializerDeserializer::deserializeUser(string serializedUser) {
+    User user;
+    vector<string> properties = Utility::splitString(serializedUser, '#', 2);
+    user.setUsername(properties[0]);
+    user.setPassword(properties[1]);
+    return user;
+}
+
+string SerializerDeserializer::serializeRating(Rating rating) {
+    string result;
+    result += Utility::getStringForNumber(rating.getISBN().size());
+    result += ",";
+    result += rating.getISBN();
+    result += Utility::getStringForNumber(rating.getRating());
+    return result;
+}
+
+Rating SerializerDeserializer::deserializeRating(string serializedRating) {
+    Rating rating;
+    vector<string> substrings = Utility::splitString(serializedRating, ',', 2);
+    int ISBNLength = atoi(substrings[0].c_str());
+    rating.setISBN(substrings[1].substr(0, ISBNLength));
+    rating.setRating(atoi(substrings[1].substr(ISBNLength, string::npos).c_str()));
+    return rating;
 }

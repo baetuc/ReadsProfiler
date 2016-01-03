@@ -1,0 +1,278 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Author	Client/Author.h	/^class Author {$/;"	c
+Author	Server/Author.h	/^class Author {$/;"	c
+Author	Tests/Author.h	/^class Author {$/;"	c
+Book	Client/Book.h	/^class Book {$/;"	c
+Book	Server/Book.h	/^class Book {$/;"	c
+Book	Tests/Book.h	/^class Book {$/;"	c
+CONNECT	Server/Server.h	10;"	d
+CREATE_USER	Server/Server.h	11;"	d
+Creation	Client/Creation.h	/^class Creation {$/;"	c
+Creation	Server/Creation.h	/^class Creation {$/;"	c
+Creation	Tests/Creation.h	/^class Creation {$/;"	c
+DATABASE	Server/DatabaseQueries.h	17;"	d
+DATABASE	Tests/DatabaseQueries.h	17;"	d
+DISCONNECT	Server/Server.h	9;"	d
+DatabaseQueries	Server/DatabaseQueries.h	/^class DatabaseQueries {$/;"	c
+DatabaseQueries	Tests/DatabaseQueries.h	/^class DatabaseQueries {$/;"	c
+FETCH	Server/Server.h	13;"	d
+ISBN	Client/Book.h	/^    string ISBN;$/;"	m	class:Book
+ISBN	Server/Book.h	/^    string ISBN;$/;"	m	class:Book
+ISBN	Tests/Book.h	/^    string ISBN;$/;"	m	class:Book
+PORT	Server/Server.cpp	20;"	d	file:
+PreviewInformation	Server/BooksScript.sql	/^create view PreviewInformation as$/;"	V
+PreviewInformation	Tests/BooksScript.sql	/^create view PreviewInformation as$/;"	V
+RATE	Server/Server.h	14;"	d
+RECOMMEND	Server/Server.h	15;"	d
+SEARCH	Server/Server.h	12;"	d
+SerializerDeserializer	Client/SerializerDeserializer.h	/^class SerializerDeserializer {$/;"	c
+SerializerDeserializer	Server/SerializerDeserializer.h	/^class SerializerDeserializer {$/;"	c
+SerializerDeserializer	Tests/SerializerDeserializer.h	/^class SerializerDeserializer {$/;"	c
+Server	Server/Server.h	/^class Server {$/;"	c
+ThreadInformation	Server/ThreadInformation.h	/^class ThreadInformation {$/;"	c
+USERS	Server/DatabaseQueries.h	18;"	d
+USERS	Tests/DatabaseQueries.h	18;"	d
+UserPassword	Server/UsersScript.sql	/^create table UserPassword ($/;"	t
+UserPassword	Tests/UsersScript.sql	/^create table UserPassword ($/;"	t
+UserPassword.password	Server/UsersScript.sql	/^    userName varchar(100) primary key,$/;"	F
+UserPassword.password	Tests/UsersScript.sql	/^    userName varchar(100) primary key,$/;"	F
+UserPassword.userName	Server/UsersScript.sql	/^create table UserPassword ($/;"	F
+UserPassword.userName	Tests/UsersScript.sql	/^create table UserPassword ($/;"	F
+Utility	Client/Utility.h	/^class Utility {$/;"	c
+Utility	Server/Utility.h	/^class Utility {$/;"	c
+Utility	Tests/Utility.h	/^class Utility {$/;"	c
+approaches	Server/BooksScript.sql	/^create table approaches$/;"	t
+approaches	Tests/BooksScript.sql	/^create table approaches$/;"	t
+approaches.opID	Server/BooksScript.sql	/^($/;"	F
+approaches.opID	Tests/BooksScript.sql	/^($/;"	F
+approaches.subgenre	Server/BooksScript.sql	/^opID integer references creations(opID) not null,$/;"	F
+approaches.subgenre	Tests/BooksScript.sql	/^opID integer references creations(opID) not null,$/;"	F
+authors	Client/Creation.h	/^    list<Author> authors;$/;"	m	class:Creation
+authors	Server/BooksScript.sql	/^create table authors$/;"	t
+authors	Server/Creation.h	/^    list<Author> authors;$/;"	m	class:Creation
+authors	Tests/BooksScript.sql	/^create table authors$/;"	t
+authors	Tests/Creation.h	/^    list<Author> authors;$/;"	m	class:Creation
+authors.autID	Server/BooksScript.sql	/^($/;"	F
+authors.autID	Tests/BooksScript.sql	/^($/;"	F
+authors.firstName	Server/BooksScript.sql	/^autID integer primary key,$/;"	F
+authors.firstName	Tests/BooksScript.sql	/^autID integer primary key,$/;"	F
+authors.secondName	Server/BooksScript.sql	/^firstName varchar(50) default 'Unknown',$/;"	F
+authors.secondName	Tests/BooksScript.sql	/^firstName varchar(50) default 'Unknown',$/;"	F
+books	Server/BooksScript.sql	/^create table books$/;"	t
+books	Tests/BooksScript.sql	/^create table books$/;"	t
+books.isbn	Server/BooksScript.sql	/^($/;"	F
+books.isbn	Tests/BooksScript.sql	/^($/;"	F
+books.numberOfRates	Server/BooksScript.sql	/^rating number check(rating>=0 and rating<=10),$/;"	F
+books.numberOfRates	Tests/BooksScript.sql	/^rating number check(rating>=0 and rating<=10),$/;"	F
+books.opID	Server/BooksScript.sql	/^numberOfRates integer default 0 check(numberOfRates>=0),$/;"	F
+books.opID	Tests/BooksScript.sql	/^numberOfRates integer default 0 check(numberOfRates>=0),$/;"	F
+books.path	Server/BooksScript.sql	/^publisher varchar(50) not null,$/;"	F
+books.path	Tests/BooksScript.sql	/^publisher varchar(50) not null,$/;"	F
+books.publicationYear	Server/BooksScript.sql	/^path varchar(100) not null unique,$/;"	F
+books.publicationYear	Tests/BooksScript.sql	/^path varchar(100) not null unique,$/;"	F
+books.publisher	Server/BooksScript.sql	/^isbn varchar(13) primary key check(length(isbn)=10 or length(isbn)=13),$/;"	F
+books.publisher	Tests/BooksScript.sql	/^isbn varchar(13) primary key check(length(isbn)=10 or length(isbn)=13),$/;"	F
+books.rating	Server/BooksScript.sql	/^publicationYear integer not null check(publicationYear>0),$/;"	F
+books.rating	Tests/BooksScript.sql	/^publicationYear integer not null check(publicationYear>0),$/;"	F
+client	Server/ThreadInformation.h	/^    int client;$/;"	m	class:ThreadInformation
+communicate	Server/Server.h	/^void Server::communicate(ThreadInformation* data){$/;"	f	class:Server
+createUser	Server/DatabaseQueries.h	/^bool DatabaseQueries::createUser(string userName, string password) {$/;"	f	class:DatabaseQueries
+createUser	Tests/DatabaseQueries.h	/^bool DatabaseQueries::createUser(string userName, string password) {$/;"	f	class:DatabaseQueries
+creation	Client/Book.h	/^    Creation creation;$/;"	m	class:Book
+creation	Server/Book.h	/^    Creation creation;$/;"	m	class:Book
+creation	Tests/Book.h	/^    Creation creation;$/;"	m	class:Book
+creationByAuthors	Server/BooksScript.sql	/^create table creationByAuthors$/;"	t
+creationByAuthors	Tests/BooksScript.sql	/^create table creationByAuthors$/;"	t
+creationByAuthors.autID	Server/BooksScript.sql	/^opID integer references creations(opID) not null,$/;"	F
+creationByAuthors.autID	Tests/BooksScript.sql	/^opID integer references creations(opID) not null,$/;"	F
+creationByAuthors.opID	Server/BooksScript.sql	/^($/;"	F
+creationByAuthors.opID	Tests/BooksScript.sql	/^($/;"	F
+creations	Server/BooksScript.sql	/^create table creations$/;"	t
+creations	Tests/BooksScript.sql	/^create table creations$/;"	t
+creations.opID	Server/BooksScript.sql	/^($/;"	F
+creations.opID	Tests/BooksScript.sql	/^($/;"	F
+creations.title	Server/BooksScript.sql	/^opID integer primary key check(opID>0),$/;"	F
+creations.title	Tests/BooksScript.sql	/^opID integer primary key check(opID>0),$/;"	F
+creations.volume	Server/BooksScript.sql	/^title varchar(100) not null,$/;"	F
+creations.volume	Tests/BooksScript.sql	/^title varchar(100) not null,$/;"	F
+deserializeAuthor	Client/SerializerDeserializer.h	/^Author SerializerDeserializer::deserializeAuthor(string serializedAuthor) {$/;"	f	class:SerializerDeserializer
+deserializeAuthor	Server/SerializerDeserializer.h	/^Author SerializerDeserializer::deserializeAuthor(string serializedAuthor) {$/;"	f	class:SerializerDeserializer
+deserializeAuthor	Tests/SerializerDeserializer.h	/^Author SerializerDeserializer::deserializeAuthor(string serializedAuthor) {$/;"	f	class:SerializerDeserializer
+deserializeBook	Client/SerializerDeserializer.h	/^Book SerializerDeserializer::deserializeBook(string serializedBook) {$/;"	f	class:SerializerDeserializer
+deserializeBook	Server/SerializerDeserializer.h	/^Book SerializerDeserializer::deserializeBook(string serializedBook) {$/;"	f	class:SerializerDeserializer
+deserializeBook	Tests/SerializerDeserializer.h	/^Book SerializerDeserializer::deserializeBook(string serializedBook) {$/;"	f	class:SerializerDeserializer
+deserializeCreation	Client/SerializerDeserializer.h	/^Creation SerializerDeserializer::deserializeCreation(string serializedCreation) {$/;"	f	class:SerializerDeserializer
+deserializeCreation	Server/SerializerDeserializer.h	/^Creation SerializerDeserializer::deserializeCreation(string serializedCreation) {$/;"	f	class:SerializerDeserializer
+deserializeCreation	Tests/SerializerDeserializer.h	/^Creation SerializerDeserializer::deserializeCreation(string serializedCreation) {$/;"	f	class:SerializerDeserializer
+execute	Server/Server.h	/^void Server::execute(void* argument) {$/;"	f	class:Server
+firstName	Client/Author.h	/^    string firstName;$/;"	m	class:Author
+firstName	Server/Author.h	/^    string firstName;$/;"	m	class:Author
+firstName	Tests/Author.h	/^    string firstName;$/;"	m	class:Author
+genres	Client/Creation.h	/^    list<string> genres;$/;"	m	class:Creation
+genres	Server/Creation.h	/^    list<string> genres;$/;"	m	class:Creation
+genres	Tests/Creation.h	/^    list<string> genres;$/;"	m	class:Creation
+getAuthors	Client/Creation.h	/^    list<Author> getAuthors() {return authors;}$/;"	f	class:Creation
+getAuthors	Server/Creation.h	/^    list<Author> getAuthors() {return authors;}$/;"	f	class:Creation
+getAuthors	Tests/Creation.h	/^    list<Author> getAuthors() {return authors;}$/;"	f	class:Creation
+getAuthorsFromISBN	Server/DatabaseQueries.h	/^list<Author> DatabaseQueries::getAuthorsFromISBN(string ISBN, sqlite3* database) {$/;"	f	class:DatabaseQueries
+getAuthorsFromISBN	Tests/DatabaseQueries.h	/^list<Author> DatabaseQueries::getAuthorsFromISBN(string ISBN, sqlite3* database) {$/;"	f	class:DatabaseQueries
+getBookFromISBN	Server/DatabaseQueries.h	/^Book DatabaseQueries::getBookFromISBN(string ISBN, sqlite3* database) {$/;"	f	class:DatabaseQueries
+getBookFromISBN	Tests/DatabaseQueries.h	/^Book DatabaseQueries::getBookFromISBN(string ISBN, sqlite3* database) {$/;"	f	class:DatabaseQueries
+getClient	Server/ThreadInformation.h	/^    int getClient() {return client;}$/;"	f	class:ThreadInformation
+getCreation	Client/Book.h	/^    Creation getCreation() {return creation;}$/;"	f	class:Book
+getCreation	Server/Book.h	/^    Creation getCreation() {return creation;}$/;"	f	class:Book
+getCreation	Tests/Book.h	/^    Creation getCreation() {return creation;}$/;"	f	class:Book
+getDoubleFromISBN	Server/DatabaseQueries.h	/^double DatabaseQueries::getDoubleFromISBN(string ISBN, sqlite3* database, string field) {$/;"	f	class:DatabaseQueries
+getDoubleFromISBN	Tests/DatabaseQueries.h	/^double DatabaseQueries::getDoubleFromISBN(string ISBN, sqlite3* database, string field) {$/;"	f	class:DatabaseQueries
+getFirstName	Client/Author.h	/^    string getFirstName() {return firstName;}$/;"	f	class:Author
+getFirstName	Server/Author.h	/^    string getFirstName() {return firstName;}$/;"	f	class:Author
+getFirstName	Tests/Author.h	/^    string getFirstName() {return firstName;}$/;"	f	class:Author
+getGenres	Client/Creation.h	/^    list<string> getGenres() {return genres;}$/;"	f	class:Creation
+getGenres	Server/Creation.h	/^    list<string> getGenres() {return genres;}$/;"	f	class:Creation
+getGenres	Tests/Creation.h	/^    list<string> getGenres() {return genres;}$/;"	f	class:Creation
+getISBN	Client/Book.h	/^    string getISBN() {return ISBN;}$/;"	f	class:Book
+getISBN	Server/Book.h	/^    string getISBN() {return ISBN;}$/;"	f	class:Book
+getISBN	Tests/Book.h	/^    string getISBN() {return ISBN;}$/;"	f	class:Book
+getISBNForBooksThatMatchTheQuery	Server/DatabaseQueries.h	/^list<string> DatabaseQueries::getISBNForBooksThatMatchTheQuery(Book query, sqlite3* database) {$/;"	f	class:DatabaseQueries
+getISBNForBooksThatMatchTheQuery	Tests/DatabaseQueries.h	/^list<string> DatabaseQueries::getISBNForBooksThatMatchTheQuery(Book query, sqlite3* database) {$/;"	f	class:DatabaseQueries
+getIntFromISBN	Server/DatabaseQueries.h	/^int DatabaseQueries::getIntFromISBN(string ISBN, sqlite3* database, string field) {$/;"	f	class:DatabaseQueries
+getIntFromISBN	Tests/DatabaseQueries.h	/^int DatabaseQueries::getIntFromISBN(string ISBN, sqlite3* database, string field) {$/;"	f	class:DatabaseQueries
+getListOfStringFromISBN	Server/DatabaseQueries.h	/^list<string> DatabaseQueries::getListOfStringFromISBN(string ISBN, sqlite3* database, string field) {$/;"	f	class:DatabaseQueries
+getListOfStringFromISBN	Tests/DatabaseQueries.h	/^list<string> DatabaseQueries::getListOfStringFromISBN(string ISBN, sqlite3* database, string field) {$/;"	f	class:DatabaseQueries
+getPasswordForUser	Server/DatabaseQueries.h	/^bool DatabaseQueries::getPasswordForUser(string userName, string& password) {$/;"	f	class:DatabaseQueries
+getPasswordForUser	Tests/DatabaseQueries.h	/^bool DatabaseQueries::getPasswordForUser(string userName, string& password) {$/;"	f	class:DatabaseQueries
+getPath	Server/DatabaseQueries.h	/^string DatabaseQueries::getPath(string ISBN) {$/;"	f	class:DatabaseQueries
+getPath	Tests/DatabaseQueries.h	/^string DatabaseQueries::getPath(string ISBN) {$/;"	f	class:DatabaseQueries
+getPublicationYear	Client/Book.h	/^    unsigned int getPublicationYear() {return publicationYear;}$/;"	f	class:Book
+getPublicationYear	Server/Book.h	/^    unsigned int getPublicationYear() {return publicationYear;}$/;"	f	class:Book
+getPublicationYear	Tests/Book.h	/^    unsigned int getPublicationYear() {return publicationYear;}$/;"	f	class:Book
+getPublisher	Client/Book.h	/^    string getPublisher() {return publisher;}$/;"	f	class:Book
+getPublisher	Server/Book.h	/^    string getPublisher() {return publisher;}$/;"	f	class:Book
+getPublisher	Tests/Book.h	/^    string getPublisher() {return publisher;}$/;"	f	class:Book
+getRating	Client/Book.h	/^    float getRating() {return rating;}$/;"	f	class:Book
+getRating	Server/Book.h	/^    float getRating() {return rating;}$/;"	f	class:Book
+getRating	Tests/Book.h	/^    float getRating() {return rating;}$/;"	f	class:Book
+getResponseToQuery	Server/DatabaseQueries.h	/^list<Book> DatabaseQueries::getResponseToQuery(Book query) {$/;"	f	class:DatabaseQueries
+getResponseToQuery	Tests/DatabaseQueries.h	/^list<Book> DatabaseQueries::getResponseToQuery(Book query) {$/;"	f	class:DatabaseQueries
+getSecondName	Client/Author.h	/^    string getSecondName() {return secondName;}$/;"	f	class:Author
+getSecondName	Server/Author.h	/^    string getSecondName() {return secondName;}$/;"	f	class:Author
+getSecondName	Tests/Author.h	/^    string getSecondName() {return secondName;}$/;"	f	class:Author
+getStatementForAuthors	Server/DatabaseQueries.h	/^string DatabaseQueries::getStatementForAuthors(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStatementForAuthors	Tests/DatabaseQueries.h	/^string DatabaseQueries::getStatementForAuthors(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStatementForGenres	Server/DatabaseQueries.h	/^string DatabaseQueries::getStatementForGenres(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStatementForGenres	Tests/DatabaseQueries.h	/^string DatabaseQueries::getStatementForGenres(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStatementForISBN	Server/DatabaseQueries.h	/^string DatabaseQueries::getStatementForISBN(Book query) {$/;"	f	class:DatabaseQueries
+getStatementForISBN	Tests/DatabaseQueries.h	/^string DatabaseQueries::getStatementForISBN(Book query) {$/;"	f	class:DatabaseQueries
+getStatementForSubgenres	Server/DatabaseQueries.h	/^string DatabaseQueries::getStatementForSubgenres(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStatementForSubgenres	Tests/DatabaseQueries.h	/^string DatabaseQueries::getStatementForSubgenres(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStatementForTitle	Server/DatabaseQueries.h	/^string DatabaseQueries::getStatementForTitle(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStatementForTitle	Tests/DatabaseQueries.h	/^string DatabaseQueries::getStatementForTitle(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStatementForVolume	Server/DatabaseQueries.h	/^string DatabaseQueries::getStatementForVolume(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStatementForVolume	Tests/DatabaseQueries.h	/^string DatabaseQueries::getStatementForVolume(Creation creation, bool& addedSomething) {$/;"	f	class:DatabaseQueries
+getStringForFloat	Client/Utility.h	/^string Utility::getStringForFloat(float number) {$/;"	f	class:Utility
+getStringForFloat	Server/Utility.h	/^string Utility::getStringForFloat(float number) {$/;"	f	class:Utility
+getStringForFloat	Tests/Utility.h	/^string Utility::getStringForFloat(float number) {$/;"	f	class:Utility
+getStringForNumber	Client/Utility.h	/^string Utility::getStringForNumber(int number) {$/;"	f	class:Utility
+getStringForNumber	Server/Utility.h	/^string Utility::getStringForNumber(int number) {$/;"	f	class:Utility
+getStringForNumber	Tests/Utility.h	/^string Utility::getStringForNumber(int number) {$/;"	f	class:Utility
+getStringFromISBN	Server/DatabaseQueries.h	/^string DatabaseQueries::getStringFromISBN(string ISBN, sqlite3* database, string field) {$/;"	f	class:DatabaseQueries
+getStringFromISBN	Tests/DatabaseQueries.h	/^string DatabaseQueries::getStringFromISBN(string ISBN, sqlite3* database, string field) {$/;"	f	class:DatabaseQueries
+getSubgenres	Client/Creation.h	/^    list<string> getSubgenres() {return subgenres;}$/;"	f	class:Creation
+getSubgenres	Server/Creation.h	/^    list<string> getSubgenres() {return subgenres;}$/;"	f	class:Creation
+getSubgenres	Tests/Creation.h	/^    list<string> getSubgenres() {return subgenres;}$/;"	f	class:Creation
+getThreadId	Server/ThreadInformation.h	/^    int getThreadId() {return threadId;}$/;"	f	class:ThreadInformation
+getTitle	Client/Creation.h	/^    string getTitle() {return title;}$/;"	f	class:Creation
+getTitle	Server/Creation.h	/^    string getTitle() {return title;}$/;"	f	class:Creation
+getTitle	Tests/Creation.h	/^    string getTitle() {return title;}$/;"	f	class:Creation
+getVolume	Client/Creation.h	/^    unsigned int getVolume() {return volume;}$/;"	f	class:Creation
+getVolume	Server/Creation.h	/^    unsigned int getVolume() {return volume;}$/;"	f	class:Creation
+getVolume	Tests/Creation.h	/^    unsigned int getVolume() {return volume;}$/;"	f	class:Creation
+hierarchy	Server/BooksScript.sql	/^create table hierarchy$/;"	t
+hierarchy	Tests/BooksScript.sql	/^create table hierarchy$/;"	t
+hierarchy.genre	Server/BooksScript.sql	/^subgenre varchar(50) primary key,$/;"	F
+hierarchy.genre	Tests/BooksScript.sql	/^subgenre varchar(50) primary key,$/;"	F
+hierarchy.subgenre	Server/BooksScript.sql	/^($/;"	F
+hierarchy.subgenre	Tests/BooksScript.sql	/^($/;"	F
+main	Server/Server.cpp	/^int main ()$/;"	f
+main	Tests/DatabaseQueriesTest.cpp	/^int main() {$/;"	f
+main	Tests/SerializerDeserializerTest.cpp	/^int main() {$/;"	f
+main	Tests/UtilityTest.cpp	/^int main() {$/;"	f
+publicationYear	Client/Book.h	/^    unsigned int publicationYear;$/;"	m	class:Book
+publicationYear	Server/Book.h	/^    unsigned int publicationYear;$/;"	m	class:Book
+publicationYear	Tests/Book.h	/^    unsigned int publicationYear;$/;"	m	class:Book
+publisher	Client/Book.h	/^    string publisher;$/;"	m	class:Book
+publisher	Server/Book.h	/^    string publisher;$/;"	m	class:Book
+publisher	Tests/Book.h	/^    string publisher;$/;"	m	class:Book
+rateBook	Server/DatabaseQueries.h	/^void DatabaseQueries::rateBook(int rate, string ISBN) {$/;"	f	class:DatabaseQueries
+rateBook	Tests/DatabaseQueries.h	/^void DatabaseQueries::rateBook(int rate, string ISBN) {$/;"	f	class:DatabaseQueries
+rating	Client/Book.h	/^    float rating;$/;"	m	class:Book
+rating	Server/Book.h	/^    float rating;$/;"	m	class:Book
+rating	Tests/Book.h	/^    float rating;$/;"	m	class:Book
+secondName	Client/Author.h	/^    string secondName;$/;"	m	class:Author
+secondName	Server/Author.h	/^    string secondName;$/;"	m	class:Author
+secondName	Tests/Author.h	/^    string secondName;$/;"	m	class:Author
+serializeAuthor	Client/SerializerDeserializer.h	/^string SerializerDeserializer::serializeAuthor(Author author) {$/;"	f	class:SerializerDeserializer
+serializeAuthor	Server/SerializerDeserializer.h	/^string SerializerDeserializer::serializeAuthor(Author author) {$/;"	f	class:SerializerDeserializer
+serializeAuthor	Tests/SerializerDeserializer.h	/^string SerializerDeserializer::serializeAuthor(Author author) {$/;"	f	class:SerializerDeserializer
+serializeBook	Client/SerializerDeserializer.h	/^string SerializerDeserializer::serializeBook(Book book) {$/;"	f	class:SerializerDeserializer
+serializeBook	Server/SerializerDeserializer.h	/^string SerializerDeserializer::serializeBook(Book book) {$/;"	f	class:SerializerDeserializer
+serializeBook	Tests/SerializerDeserializer.h	/^string SerializerDeserializer::serializeBook(Book book) {$/;"	f	class:SerializerDeserializer
+serializeCreation	Client/SerializerDeserializer.h	/^string SerializerDeserializer::serializeCreation(Creation creation) {$/;"	f	class:SerializerDeserializer
+serializeCreation	Server/SerializerDeserializer.h	/^string SerializerDeserializer::serializeCreation(Creation creation) {$/;"	f	class:SerializerDeserializer
+serializeCreation	Tests/SerializerDeserializer.h	/^string SerializerDeserializer::serializeCreation(Creation creation) {$/;"	f	class:SerializerDeserializer
+setAuthors	Client/Creation.h	/^    void setAuthors(list<Author> authors) {this->authors = authors;}$/;"	f	class:Creation
+setAuthors	Server/Creation.h	/^    void setAuthors(list<Author> authors) {this->authors = authors;}$/;"	f	class:Creation
+setAuthors	Tests/Creation.h	/^    void setAuthors(list<Author> authors) {this->authors = authors;}$/;"	f	class:Creation
+setClient	Server/ThreadInformation.h	/^    void setClient(int client) {this->client = client;}$/;"	f	class:ThreadInformation
+setCreation	Client/Book.h	/^    void setCreation(Creation creation) {this->creation = creation;}$/;"	f	class:Book
+setCreation	Server/Book.h	/^    void setCreation(Creation creation) {this->creation = creation;}$/;"	f	class:Book
+setCreation	Tests/Book.h	/^    void setCreation(Creation creation) {this->creation = creation;}$/;"	f	class:Book
+setFirstName	Client/Author.h	/^    void setFirstName(string firstName) {this->firstName = firstName;}$/;"	f	class:Author
+setFirstName	Server/Author.h	/^    void setFirstName(string firstName) {this->firstName = firstName;}$/;"	f	class:Author
+setFirstName	Tests/Author.h	/^    void setFirstName(string firstName) {this->firstName = firstName;}$/;"	f	class:Author
+setGenres	Client/Creation.h	/^    void setGenres(list<string> genres) {this->genres = genres;}$/;"	f	class:Creation
+setGenres	Server/Creation.h	/^    void setGenres(list<string> genres) {this->genres = genres;}$/;"	f	class:Creation
+setGenres	Tests/Creation.h	/^    void setGenres(list<string> genres) {this->genres = genres;}$/;"	f	class:Creation
+setISBN	Client/Book.h	/^    void setISBN(string ISBN) {this->ISBN = ISBN;}$/;"	f	class:Book
+setISBN	Server/Book.h	/^    void setISBN(string ISBN) {this->ISBN = ISBN;}$/;"	f	class:Book
+setISBN	Tests/Book.h	/^    void setISBN(string ISBN) {this->ISBN = ISBN;}$/;"	f	class:Book
+setPublicationYear	Client/Book.h	/^    void setPublicationYear(unsigned int publicationYear) {this->publicationYear = publicationYear;}$/;"	f	class:Book
+setPublicationYear	Server/Book.h	/^    void setPublicationYear(unsigned int publicationYear) {this->publicationYear = publicationYear;}$/;"	f	class:Book
+setPublicationYear	Tests/Book.h	/^    void setPublicationYear(unsigned int publicationYear) {this->publicationYear = publicationYear;}$/;"	f	class:Book
+setPublisher	Client/Book.h	/^    void setPublisher(string publisher) {this->publisher = publisher;}$/;"	f	class:Book
+setPublisher	Server/Book.h	/^    void setPublisher(string publisher) {this->publisher = publisher;}$/;"	f	class:Book
+setPublisher	Tests/Book.h	/^    void setPublisher(string publisher) {this->publisher = publisher;}$/;"	f	class:Book
+setRating	Client/Book.h	/^    void setRating(float rating) {this->rating = rating;}$/;"	f	class:Book
+setRating	Server/Book.h	/^    void setRating(float rating) {this->rating = rating;}$/;"	f	class:Book
+setRating	Tests/Book.h	/^    void setRating(float rating) {this->rating = rating;}$/;"	f	class:Book
+setSecondName	Client/Author.h	/^    void setSecondName(string secondName) {this->secondName = secondName;}$/;"	f	class:Author
+setSecondName	Server/Author.h	/^    void setSecondName(string secondName) {this->secondName = secondName;}$/;"	f	class:Author
+setSecondName	Tests/Author.h	/^    void setSecondName(string secondName) {this->secondName = secondName;}$/;"	f	class:Author
+setSubgenres	Client/Creation.h	/^    void setSubgenres(list<string> subgenres) {this->subgenres = subgenres;}$/;"	f	class:Creation
+setSubgenres	Server/Creation.h	/^    void setSubgenres(list<string> subgenres) {this->subgenres = subgenres;}$/;"	f	class:Creation
+setSubgenres	Tests/Creation.h	/^    void setSubgenres(list<string> subgenres) {this->subgenres = subgenres;}$/;"	f	class:Creation
+setThreadId	Server/ThreadInformation.h	/^    void setThreadId(int threadId) {this->threadId = threadId;}$/;"	f	class:ThreadInformation
+setTitle	Client/Creation.h	/^    void setTitle(string title) {this->title = title;}$/;"	f	class:Creation
+setTitle	Server/Creation.h	/^    void setTitle(string title) {this->title = title;}$/;"	f	class:Creation
+setTitle	Tests/Creation.h	/^    void setTitle(string title) {this->title = title;}$/;"	f	class:Creation
+setVolume	Client/Creation.h	/^    void setVolume(unsigned int volume) {this->volume = volume;}$/;"	f	class:Creation
+setVolume	Server/Creation.h	/^    void setVolume(unsigned int volume) {this->volume = volume;}$/;"	f	class:Creation
+setVolume	Tests/Creation.h	/^    void setVolume(unsigned int volume) {this->volume = volume;}$/;"	f	class:Creation
+splitString	Client/Utility.h	/^vector<string> Utility::splitString(string source, char delimiter, int maxParts) {$/;"	f	class:Utility
+splitString	Server/Utility.h	/^vector<string> Utility::splitString(string source, char delimiter, int maxParts) {$/;"	f	class:Utility
+splitString	Tests/Utility.h	/^vector<string> Utility::splitString(string source, char delimiter, int maxParts) {$/;"	f	class:Utility
+subgenres	Client/Creation.h	/^    list<string> subgenres;$/;"	m	class:Creation
+subgenres	Server/Creation.h	/^    list<string> subgenres;$/;"	m	class:Creation
+subgenres	Tests/Creation.h	/^    list<string> subgenres;$/;"	m	class:Creation
+threadId	Server/ThreadInformation.h	/^    int threadId;$/;"	m	class:ThreadInformation
+title	Client/Creation.h	/^    string title;$/;"	m	class:Creation
+title	Server/Creation.h	/^    string title;$/;"	m	class:Creation
+title	Tests/Creation.h	/^    string title;$/;"	m	class:Creation
+volume	Client/Creation.h	/^    unsigned int volume;$/;"	m	class:Creation
+volume	Server/Creation.h	/^    unsigned int volume;$/;"	m	class:Creation
+volume	Tests/Creation.h	/^    unsigned int volume;$/;"	m	class:Creation

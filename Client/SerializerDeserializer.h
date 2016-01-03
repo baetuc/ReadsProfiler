@@ -3,25 +3,28 @@
     Date: 31 Dec 2015
 */
 
-#include "Book.h"
 #include <string>
 #include <vector>
 #include <list>
 #include <stdlib.h>
-#include "Utility.h"
 #include <iostream>
+#include "Book.h"
+#include "User.h"
+#include "Utility.h"
 
 using namespace std;
 
 class SerializerDeserializer {
 private:
-    string serializeCreation(Creation);
-    string serializeAuthor(Author);
-    Creation deserializeCreation(string);
-    Author deserializeAuthor(string);
+    static string serializeCreation(Creation);
+    static string serializeAuthor(Author);
+    static Creation deserializeCreation(string);
+    static Author deserializeAuthor(string);
 public:
-    string serializeBook(Book);
-    Book deserializeBook(string);
+    static string serializeBook(Book);
+    static Book deserializeBook(string);
+    static string serializeUser(User);
+    static User deserializeUser(string);
 };
 
 string SerializerDeserializer::serializeAuthor(Author author) {
@@ -188,4 +191,19 @@ Book SerializerDeserializer::deserializeBook(string serializedBook) {
     book.setRating((float)atof(current.c_str()));
 
     return book;
+}
+
+string SerializerDeserializer::serializeUser(User user) {
+    string serializedUser = user.getUsername();
+    serializedUser += "#";
+    serializedUser += user.getPassword();
+    return serializedUser;
+}
+
+User SerializerDeserializer::deserializeUser(string serializedUser) {
+    User user;
+    vector<string> properties = Utility::splitString(serializedUser, '#', 2);
+    user.setUsername(properties[0]);
+    user.setPassword(properties[1]);
+    return user;
 }

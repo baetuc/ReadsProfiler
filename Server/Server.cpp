@@ -74,7 +74,7 @@ int main ()
         printf ("Waiting at port: %d...\n", PORT);
         fflush (stdout);
 
-        if ((client = accept(socketDescriptor, (struct sockaddr*) &from, &addressLength)) < 0)
+        if ((client = accept(socketDescriptor, (struct sockaddr*) &from, (socklen_t*)&addressLength)) < 0)
         {
             perror ("Error at accepting client.\n");
             continue;
@@ -86,7 +86,7 @@ int main ()
         threads.push_back(new pthread_t); // This may be tricky
 
 
-        pthread_create(threads[i - 1], NULL, &Server::execute, data);
+        pthread_create(threads[numberOfThreads - 1], NULL, &Server::execute, data);
 
     }
     return 0;
