@@ -15,6 +15,7 @@
 #include "Utility.h"
 
 #define DATABASE "Books.db"
+#define USERS "Users.db"
 
 using namespace std;
 
@@ -24,12 +25,12 @@ using namespace std;
 */
 class DatabaseQueries {
 private:
+    // these methods are to query the database and give result to a search
     static string getStatementForTitle(Creation creation, bool& addedSomething);
     static string getStatementForVolume(Creation creation, bool& addedSomething);
     static string getStatementForAuthors(Creation creation, bool& addedSomething);
     static string getStatementForGenres(Creation creation, bool& addedSomething);
     static string getStatementForSubgenres(Creation creation, bool& addedSomething);
-
     static string getStatementForISBN(Book query);
     static list<string> getISBNForBooksThatMatchTheQuery(Book query, sqlite3* database);
     static string getStringFromISBN(string ISBN, sqlite3* database, string field);
@@ -41,6 +42,10 @@ private:
 
 public:
     static list<Book> getResponseToQuery(Book query);
+    static void rateBook(int rate, string ISBN); // method that updates book rating
+    static string getPath(string ISBN); // method that returns book's path
+    static bool getPasswordForUser(string user, string& password);
+    static bool createUser(string user, string password);
 };
 
 string DatabaseQueries::getStatementForTitle(Creation creation, bool& addedSomething) {
@@ -345,4 +350,187 @@ list<Book> DatabaseQueries::getResponseToQuery(Book query) {
     sqlite3_close(database);
 
     return result;
+}
+
+void DatabaseQueries::rateBook(int rate, string ISBN) {
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt;
+
+    /* Open database */
+    response = sqlite3_open(DATABASE, &database);
+    if(response){
+        // TODO : send error message to child?
+        cerr << "Can't open database: " << sqlite3_errmsg(database) << '\n';
+        exit(0);
+    }
+    int numberOfRates;
+    double oldRate;
+    string statement = "select numberOfRates from books where ISBN='";
+    statement += ISBN;
+    statement += "';";
+
+    response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
+        exit(0); // TODO: think about throw?
+    }
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        numberOfRates = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+
+    sqlite3_stmt *stmt2;
+    statement = "select rating from books where ISBN='";
+    statement += ISBN;
+    statement += "';";
+    response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt2, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
+        exit(0); // TODO: think about throw?
+    }
+    if (sqlite3_step(stmt2) == SQLITE_ROW) {
+        oldRate = sqlite3_column_double(stmt2, 0);
+    }
+    sqlite3_finalize(stmt2);
+
+    double newRating = (oldRate * (double) numberOfRates + (double)rate)/ (double)(numberOfRates + 1);
+    statement = "update books set numberOfRates=numberOfRates+1, rating=";
+    statement += Utility::getStringForFloat((float) newRating);
+    statement += " where ISBN='";
+    statement += ISBN;
+    statement += "';";
+
+    sqlite3_stmt *stmt3;
+    response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt3, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "UPDATE failed: " << sqlite3_errmsg(database) << '\n';
+        exit(0); // TODO: think about throw?
+    }
+    if (sqlite3_step(stmt3) != SQLITE_DONE) {
+        cerr << "UPDATE failed: " << sqlite3_errmsg(database) << '\n';
+    }
+    sqlite3_finalize(stmt3);
+    sqlite3_close(database);
+}
+
+
+string DatabaseQueries::getPath(string ISBN) {
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt;
+
+    /* Open database */
+    response = sqlite3_open(DATABASE, &database);
+    if(response){
+        // TODO : send error message to child?
+        cerr << "Can't open database: " << sqlite3_errmsg(database) << '\n';
+        exit(0);
+    }
+
+    string statement = "select path from books where ISBN='";
+    statement += ISBN;
+    statement += "';";
+
+    response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT path failed: " << sqlite3_errmsg(database) << '\n';
+        exit(0); // TODO: think about throw?
+    }
+    string resultInString;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        char* result = (char*)(sqlite3_column_text(stmt, 0));
+        int length = sqlite3_column_bytes(stmt, 0);
+        resultInString.assign(result, length);
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(database);
+    return resultInString;
+}
+
+// returns false if user doesn't exist
+bool DatabaseQueries::getPasswordForUser(string userName, string& password) {
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt;
+
+    /* Open database */
+    response = sqlite3_open(USERS, &database);
+    if(response){
+        // TODO : send error message to child?
+        cerr << "Can't open database: " << sqlite3_errmsg(database) << '\n';
+        exit(0);
+    }
+
+    string statement = "select password from userPassword where userName='";
+    statement += userName;
+    statement += "';";
+
+    response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT user failed: " << sqlite3_errmsg(database) << '\n';
+        exit(0); // TODO: think about throw?
+    }
+    bool existsUser = false;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        existsUser = true;
+        char* result = (char*)(sqlite3_column_text(stmt, 0));
+        int length = sqlite3_column_bytes(stmt, 0);
+        password.assign(result, length);
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(database);
+    return existsUser;
+}
+
+// returns true if user existed already and false in the other case
+// if returned false, it follows that the user created successfully
+bool DatabaseQueries::createUser(string userName, string password) {
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt, *stmt2;
+
+    /* Open database */
+    response = sqlite3_open(USERS, &database);
+    if(response){
+        // TODO : send error message to child?
+        cerr << "Can't open database: " << sqlite3_errmsg(database) << '\n';
+        exit(0);
+    }
+
+    string statement = "select count(*) from userPassword where userName='";
+    statement += userName;
+    statement += "';";
+    bool existsUser = true;
+
+    response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        cerr << "SELECT count(*) failed: " << sqlite3_errmsg(database) << '\n';
+        exit(0); // TODO: think about throw?
+    }
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+
+        int haha = sqlite3_column_int(stmt, 0);
+        existsUser = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+
+    if(!existsUser) {
+        statement = "insert into userPassword values ('";
+        statement += userName;
+        statement += "','";
+        statement += password;
+        statement += "');";
+        response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt2, NULL);
+        if (response != SQLITE_OK) {
+            cerr << "INSERT failed: " << sqlite3_errmsg(database) << '\n';
+            exit(0); // TODO: think about throw?
+        }
+        if (sqlite3_step(stmt2) != SQLITE_DONE) {
+            cerr << "INSERT failed: " << sqlite3_errmsg(database) << '\n';
+        }
+        sqlite3_finalize(stmt2);
+    }
+    sqlite3_close(database);
+    return existsUser;
 }

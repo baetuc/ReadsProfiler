@@ -54,8 +54,6 @@ int main() {
     otherBook.setCreation(otherCreation);
 
 
-
-
     //cout << DatabaseQueries::getStatementForISBN(book) << '\n';
     //cout << DatabaseQueries::getStatementForISBN(otherBook) << '\n';
 
@@ -63,6 +61,47 @@ int main() {
     for(list<Book>::iterator it = queryResult.begin(); it != queryResult.end(); ++it) {
         cout << serializer.serializeBook(*it) << '\n';
     }
+    cout << "Path is: " << DatabaseQueries::getPath("9783161484102") << '\n';
+    DatabaseQueries::rateBook(4, "9783161484102");
+
+    // Password retrieval test
+    string passwd;
+    bool existsUser;
+    existsUser = DatabaseQueries::getPasswordForUser("Cip", passwd);
+    if(existsUser) {
+        cout << "Cip's password is: " << passwd << '\n';
+    }
+    else {
+        cout << "Cip is an invalid username" << '\n';
+    }
+
+    existsUser = DatabaseQueries::getPasswordForUser("Trompy", passwd);
+    if(existsUser) {
+        cout << "Trompy's password is: " << passwd << '\n';
+    }
+    else {
+        cout << "Trompy is an invalid username" << '\n';
+    }
+
+    // User creation test
+    existsUser = DatabaseQueries::createUser("Cip", passwd);
+    if(!existsUser) {
+        cout << "User Cip created successfully\n";
+    }
+    else {
+        cout << "User Cip already existed." << '\n';
+    }
+
+    existsUser = DatabaseQueries::createUser("Trompy", passwd);
+    if(!existsUser) {
+        cout << "User Trompy created successfully\n";
+    }
+    else {
+        cout << "User Trompy already existed." << '\n';
+    }
+
+
+
 
     return 0;
 

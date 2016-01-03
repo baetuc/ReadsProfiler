@@ -1,2 +1,9 @@
 13,Anna Karenina1,1,Tolstoi,Lev;1,Fictiune,1,Drama,#13,97831614841078,Adevarul2008,10.00
 13,Anna Karenina2,1,Tolstoi,Lev;1,Fictiune,1,Familie,#13,97831614841088,Adevarul2009,9.800
+Path is: ~/home/Programs/RC/Proiect/3.txt
+Cip's password is: helloworld
+Trompy is an invalid username
+1BHDSA
+User Cip already existed.
+0BHDSA
+User Trompy created successfully
