@@ -177,8 +177,7 @@ list<string> DatabaseQueries::getISBNForBooksThatMatchTheQuery(Book query, sqlit
     sqlite3_stmt *stmt;
     response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT failed BOOKS THAT MATCH: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT failed BOOKS THAT MATCH ", sqlite3_errmsg(database), "\n");
     }
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         char* ISBN = (char*)(sqlite3_column_text(stmt, 0));
@@ -186,6 +185,7 @@ list<string> DatabaseQueries::getISBNForBooksThatMatchTheQuery(Book query, sqlit
     }
     sqlite3_finalize(stmt);
     return ISBNs;
+
 }
 
 string DatabaseQueries::getStringFromISBN(string ISBN, sqlite3* database, string field) {
@@ -200,8 +200,7 @@ string DatabaseQueries::getStringFromISBN(string ISBN, sqlite3* database, string
     sqlite3_stmt *stmt;
     response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT failed STRING FROM: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT failed STRING FROM: ", sqlite3_errmsg(database), "\n");
     }
     string resultInString;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -225,8 +224,7 @@ int DatabaseQueries::getIntFromISBN(string ISBN, sqlite3* database, string field
     sqlite3_stmt *stmt;
     response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT failed INT: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT failed INT: ", sqlite3_errmsg(database), "\n");
     }
     int result;
     while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -249,8 +247,7 @@ list<Author> DatabaseQueries::getAuthorsFromISBN(string ISBN, sqlite3* database)
     sqlite3_stmt *stmt;
     response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT failed AUTHORS: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT failed AUTHORS: ", sqlite3_errmsg(database), "\n");
     }
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         char* firstName = (char*)(sqlite3_column_text(stmt, 0));
@@ -276,8 +273,7 @@ list<string> DatabaseQueries::getListOfStringFromISBN(string ISBN, sqlite3* data
     list<string> result;
     response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT failed LIST STRING: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT failed LIST STRING: ", sqlite3_errmsg(database), "\n");
     }
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         char* line = (char*)(sqlite3_column_text(stmt, 0));
@@ -301,7 +297,7 @@ double DatabaseQueries::getDoubleFromISBN(string ISBN, sqlite3* database, string
     double result;
     response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT failed FLOAT: " << sqlite3_errmsg(database) << '\n';
+        throw Utility::concatenateStrings("SELECT failed FLOAT: ", sqlite3_errmsg(database), "\n");
         exit(0); // TODO: think about throw?
     }
     while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -336,9 +332,7 @@ list<Book> DatabaseQueries::getResponseToQuery(Book query) {
     /* Open database */
     response = sqlite3_open(DATABASE, &database);
     if(response){
-        // TODO : send error message to child?
-        cerr << "Can't open database: " << sqlite3_errmsg(database) << '\n';
-        exit(0);
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
     }
 
     list<string> ISBNs = getISBNForBooksThatMatchTheQuery(query, database);
@@ -360,9 +354,7 @@ void DatabaseQueries::rateBook(int rate, string ISBN) {
     /* Open database */
     response = sqlite3_open(DATABASE, &database);
     if(response){
-        // TODO : send error message to child?
-        cerr << "Can't open database: " << sqlite3_errmsg(database) << '\n';
-        exit(0);
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
     }
     int numberOfRates;
     double oldRate;
@@ -372,8 +364,7 @@ void DatabaseQueries::rateBook(int rate, string ISBN) {
 
     response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT failed: ", sqlite3_errmsg(database), "\n");
     }
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         numberOfRates = sqlite3_column_int(stmt, 0);
@@ -386,8 +377,7 @@ void DatabaseQueries::rateBook(int rate, string ISBN) {
     statement += "';";
     response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt2, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT failed: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT failed: ", sqlite3_errmsg(database), "\n");
     }
     if (sqlite3_step(stmt2) == SQLITE_ROW) {
         oldRate = sqlite3_column_double(stmt2, 0);
@@ -404,11 +394,10 @@ void DatabaseQueries::rateBook(int rate, string ISBN) {
     sqlite3_stmt *stmt3;
     response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt3, NULL);
     if (response != SQLITE_OK) {
-        cerr << "UPDATE failed: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("UPDATE failed: ", sqlite3_errmsg(database), "\n");
     }
     if (sqlite3_step(stmt3) != SQLITE_DONE) {
-        cerr << "UPDATE failed: " << sqlite3_errmsg(database) << '\n';
+        throw Utility::concatenateStrings("UPDATE failed: ", sqlite3_errmsg(database), "\n");
     }
     sqlite3_finalize(stmt3);
     sqlite3_close(database);
@@ -423,9 +412,7 @@ string DatabaseQueries::getPath(string ISBN) {
     /* Open database */
     response = sqlite3_open(DATABASE, &database);
     if(response){
-        // TODO : send error message to child?
-        cerr << "Can't open database: " << sqlite3_errmsg(database) << '\n';
-        exit(0);
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
     }
 
     string statement = "select path from books where ISBN='";
@@ -434,8 +421,7 @@ string DatabaseQueries::getPath(string ISBN) {
 
     response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT path failed: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT path failed: ", sqlite3_errmsg(database), "\n");
     }
     string resultInString;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -457,9 +443,7 @@ bool DatabaseQueries::getPasswordForUser(string userName, string& password) {
     /* Open database */
     response = sqlite3_open(USERS, &database);
     if(response){
-        // TODO : send error message to child?
-        cerr << "Can't open database: " << sqlite3_errmsg(database) << '\n';
-        exit(0);
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
     }
 
     string statement = "select password from userPassword where userName='";
@@ -468,7 +452,7 @@ bool DatabaseQueries::getPasswordForUser(string userName, string& password) {
 
     response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT user failed: " << sqlite3_errmsg(database) << '\n';
+        throw Utility::concatenateStrings("SELECT user failed: ", sqlite3_errmsg(database), "\n");
         exit(0); // TODO: think about throw?
     }
     bool existsUser = false;
@@ -493,9 +477,7 @@ bool DatabaseQueries::createUser(string userName, string password) {
     /* Open database */
     response = sqlite3_open(USERS, &database);
     if(response){
-        // TODO : send error message to child?
-        cerr << "Can't open database: " << sqlite3_errmsg(database) << '\n';
-        exit(0);
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
     }
 
     string statement = "select count(*) from userPassword where userName='";
@@ -505,12 +487,9 @@ bool DatabaseQueries::createUser(string userName, string password) {
 
     response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        cerr << "SELECT count(*) failed: " << sqlite3_errmsg(database) << '\n';
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT COUNT(*) failed: ", sqlite3_errmsg(database), "\n");
     }
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-
-        int haha = sqlite3_column_int(stmt, 0);
         existsUser = sqlite3_column_int(stmt, 0);
     }
     sqlite3_finalize(stmt);
@@ -523,11 +502,10 @@ bool DatabaseQueries::createUser(string userName, string password) {
         statement += "');";
         response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt2, NULL);
         if (response != SQLITE_OK) {
-            cerr << "INSERT failed: " << sqlite3_errmsg(database) << '\n';
-            exit(0); // TODO: think about throw?
+            throw Utility::concatenateStrings("INSERT user failed: ", sqlite3_errmsg(database), "\n");
         }
         if (sqlite3_step(stmt2) != SQLITE_DONE) {
-            cerr << "INSERT failed: " << sqlite3_errmsg(database) << '\n';
+            throw Utility::concatenateStrings("INSERT user failed: ", sqlite3_errmsg(database), "\n");
         }
         sqlite3_finalize(stmt2);
     }
