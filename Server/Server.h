@@ -2,8 +2,11 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include "Book.h"
+#include <fstream>
 #include "DatabaseQueries.h"
 #include "SerializerDeserializer.h"
 #include "ThreadInformation.h"
@@ -46,7 +49,9 @@ public:
 
 void Server::sendMessageToClient(int threadId, int client, string message, bool error) {
     uint32_t typeOfMessage = error == true ? ERR_MSG : OK_MSG;
+    cout << typeOfMessage << '\n';
     typeOfMessage = htonl(typeOfMessage);
+
     if(write(client, &typeOfMessage, sizeof(uint32_t)) < 0) {
         string err = "[Thread ";
         err += Utility::getStringForNumber(threadId);
@@ -55,8 +60,9 @@ void Server::sendMessageToClient(int threadId, int client, string message, bool 
         const char* charErr = err.c_str();
         throw charErr;
     }
-
     uint32_t size = message.size();
+    cout << size << '\n';
+    cout << message << '\n';
     size = htonl(size);
     if(write(client, &size, sizeof(uint32_t)) < 0) {
         string err = "[Thread ";
@@ -66,8 +72,10 @@ void Server::sendMessageToClient(int threadId, int client, string message, bool 
         const char* charErr = err.c_str();
         throw charErr;
     }
-    size = ntohl(size);
+    size = message.size();
+    cout << size << '\n';
     for(uint32_t i = 0; i < size; ++i) {
+        //cout << "Caracterul " << i << "\n";
         if (write(client, &message[i], sizeof(char)) <= 0) {
             string err = "[Thread ";
             err += Utility::getStringForNumber(threadId);
@@ -154,11 +162,10 @@ void Server::search(ThreadInformation* data) {
     int threadId = data->getThreadId();
 
     string serializedBook = receiveMessageFromClient(threadId, client);
-
+    cout << serializedBook << '\n';
     Book book = SerializerDeserializer::deserializeBook(serializedBook);
     list<Book> response = DatabaseQueries::getResponseToQuery(book);
     string serializedBooks = SerializerDeserializer::serializeBookList(response);
-
     sendMessageToClient(threadId, client, serializedBooks, false);
 }
 
@@ -167,17 +174,33 @@ void Server::fetch(ThreadInformation* data) {
     int threadId = data->getThreadId();
 
     string ISBN = receiveMessageFromClient(threadId, client);
+    //cout << "Received ISBN: " << ISBN << '\n';
     string path = DatabaseQueries::getPath(ISBN);
-    FILE * f = fopen(path.c_str(), "r");
-    fseek(f, 0, SEEK_END);
-    uint32_t fileSize = (uint32_t) ftell(f);
-    fseek(f, 0, SEEK_SET);
-    fclose(f);
+    //cout << "Path: " << path << '\n';
+    cout << "Path is: " << path << " a\n";
+
+    //uint32_t fileSize = 0;
+    uint32_t fileSize = 0;
+    ifstream fileSeqIn;
+    fileSeqIn.open(path.c_str(), ios::in | ios::binary |ios::ate);
+    fileSize = fileSeqIn.tellg();
+    fileSeqIn.close();
+
+    fileSize = fileSize;
+    if(fileSize < 0) {
+        string err = "[Thread ";
+        err += Utility::getStringForNumber(threadId);
+        err += "] Eroare la aflarea dimensiunii fisierului.\n";
+        const char* charErr = err.c_str();
+        throw charErr;
+    }
+    cout << fileSize << '\n';
+
     int fd = open(path.c_str(), O_RDONLY, 0700);
 
     fileSize = htonl(fileSize);
     // The client must be careful here.
-    if (write(client, &fileSize, sizeof(off_t)) <= 0) {
+    if (write(client, &fileSize, sizeof(uint32_t)) <= 0) {
         string err = "[Thread ";
         err += Utility::getStringForNumber(threadId);
         err += "] Eroare la scrierea raspunsului de download a fisierului.\n";
@@ -277,12 +300,12 @@ void* Server::execute(void* argument) {
     }
     catch(const char* message) {
         cout << message;
-        try {
+        /*try {
             sendMessageToClient(data->getThreadId(), data->getClient(), message, true);
         }
         catch(const char* message) {
             cout << "Nu am putut comunica eroarea clientului.\n";
-        }
+        }*/
     }
 
     // by this point, we ended the communication with this client and close the connection

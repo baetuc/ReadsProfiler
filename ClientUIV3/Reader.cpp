@@ -8,6 +8,7 @@
 #include<QMessageBox>
 #include <Reader.h>
 #include <mainwindow.h>
+#include<Utility.h>
 
 
 #define ERR_MSG 0
@@ -63,4 +64,5 @@ void Reader::sendMessageToServer(int sd, MainWindow* parent, string message) {
         }
     }
 }
+
 

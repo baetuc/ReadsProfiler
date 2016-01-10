@@ -14,12 +14,16 @@ class Search : public QDialog, public Socket
     Q_OBJECT
 
 public:
-    explicit Search(QWidget *parent = 0);
+    explicit Search(int sd, string username = "", QWidget *parent = 0);
+    Search(list<Book> books, string username = "", QWidget* parent = 0);
     ~Search();
+
+    list<Book> books;
+    string username;
 
 public slots:
 
-    void viewButton(Book book);
+    void viewButton(Book book, list<Book> books);
 
 private slots:
     void on_commandLinkButton_clicked();

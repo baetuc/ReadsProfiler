@@ -17,11 +17,15 @@
 
 using namespace std;
 
-Dialog::Dialog(QWidget *parent) :
+Dialog::Dialog(string username, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
+    this->username = username;
     ui->setupUi(this);
+    string loggedAs = "Logat ca: ";
+    loggedAs += username;
+    ui->logged_as->setText(loggedAs.c_str());
 }
 
 Dialog::~Dialog()
@@ -73,7 +77,7 @@ void Dialog::on_cauta_clicked() {
            exit(0);
        }
        Reader::sendMessageToServer(sd, (MainWindow*) this->parent(), serializedBook);
-       Search search;
+       Search search(sd, this->username);
        search.setVisible(true);
        this->setVisible(false);
        search.sd = this->sd;
@@ -84,11 +88,11 @@ void Dialog::on_cauta_clicked() {
 
 void Dialog::on_pushButton_clicked()
 {
-    MainWindow window;
-    window.setVisible(true);
+    MainWindow* window = new MainWindow(sd, true, this->username);
+    window->setVisible(true);
     this->setVisible(false);
-    window.sd = this->sd;
-    window.connected = this->connected;
+    window->sd = this->sd;
+    window->connected = this->connected;
     this->close();
-    window.show();
+    window->show();
 }

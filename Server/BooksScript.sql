@@ -151,28 +151,27 @@ insert into approaches values(21,'Drama');
 insert into approaches values(22,'Matematica');
 
 
-insert into books values('9783161484100','Adevarul','~/home/Programs/RC/Proiect/1.txt',2008,9.8,0,1);
-insert into books values('9783161484101','Adevarul','~/home/Programs/RC/Proiect/2.txt',2008,8,0,2);
-insert into books values('9783161484102','Adevarul','~/home/Programs/RC/Proiect/3.txt',2008,7.3,0,3);
-insert into books values('9783161484103','Adevarul','~/home/Programs/RC/Proiect/4.txt',2008,8.7,0,4);
-insert into books values('9783161484104','Adevarul','~/home/Programs/RC/Proiect/5.txt',2008,5,0,5);
-insert into books values('9783161484105','Adevarul','~/home/Programs/RC/Proiect/6.txt',2008,7,0,6);
-insert into books values('9783161484106','Adevarul','~/home/Programs/RC/Proiect/7.txt',2008,9,0,7);
-insert into books values('9783161484107','Adevarul','~/home/Programs/RC/Proiect/8.txt',2008,10,0,8);
-insert into books values('9783161484108','Adevarul','~/home/Programs/RC/Proiect/9.txt',2009,9.8,0,9);
-insert into books values('9783161484109','Adevarul','~/home/Programs/RC/Proiect/10.txt',2009,8.7,0,10);
-insert into books values('9783161484118','Adevarul','~/home/Programs/RC/Proiect/11.txt',2009,7,0,11);
-insert into books values('9783161484122','Adevarul','~/home/Programs/RC/Proiect/12.txt',2009,9.5,0,12);
-insert into books values('9783161484132','Adevarul','~/home/Programs/RC/Proiect/13.txt',2009,9.1,0,13);
-insert into books values('9783161484142','Adevarul','~/home/Programs/RC/Proiect/14.txt',2009,5.5,0,14);
-insert into books values('9783161484152','Adevarul','~/home/Programs/RC/Proiect/15.txt',2009,8.5,0,15);
-insert into books values('9783161484162','Adevarul','~/home/Programs/RC/Proiect/16.txt',2009,9,0,16);
-insert into books values('9783161484172','Adevarul','~/home/Programs/RC/Proiect/17.txt',2009,7,0,17);
+insert into books values('9783161484100','Adevarul','/home/cip/Programs/RC/Proiect/1.txt',2008,9.8,0,1);
+insert into books values('9783161484101','Adevarul','/home/cip/Programs/RC/Proiect/2.txt',2008,8,0,2);
+insert into books values('9783161484102','Adevarul','/home/cip/Programs/RC/Proiect/3.txt',2008,7.3,0,3);
+insert into books values('9783161484103','Adevarul','/home/cip/Programs/RC/Proiect/4.txt',2008,8.7,0,4);
+insert into books values('9783161484104','Adevarul','/home/cip/Programs/RC/Proiect/5.txt',2008,5,0,5);
+insert into books values('9783161484105','Adevarul','/home/cip/Programs/RC/Proiect/6.txt',2008,7,0,6);
+insert into books values('9783161484106','Adevarul','/home/cip/Programs/RC/Proiect/7.txt',2008,9,0,7);
+insert into books values('9783161484107','Adevarul','/home/cip/Programs/RC/Proiect/8.txt',2008,10,0,8);
+insert into books values('9783161484108','Adevarul','/home/cip/Programs/RC/Proiect/9.txt',2009,9.8,0,9);
+insert into books values('9783161484109','Adevarul','/home/cip/Programs/RC/Proiect/10.txt',2009,8.7,0,10);
+insert into books values('9783161484118','Adevarul','/home/cip/Programs/RC/Proiect/11.txt',2009,7,0,11);
+insert into books values('9783161484122','Adevarul','/home/cip/Programs/RC/Proiect/12.txt',2009,9.5,0,12);
+insert into books values('9783161484132','Adevarul','/home/cip/Programs/RC/Proiect/13.txt',2009,9.1,0,13);
+insert into books values('9783161484142','Adevarul','/home/cip/Programs/RC/Proiect/14.txt',2009,5.5,0,14);
+insert into books values('9783161484152','Adevarul','/home/cip/Programs/RC/Proiect/15.txt',2009,8.5,0,15);
+insert into books values('9783161484162','Adevarul','/home/cip/Programs/RC/Proiect/16.txt',2009,9,0,16);
+insert into books values('9783161484172','Adevarul','/home/cip/Programs/RC/Proiect/17.txt',2009,7,0,17);
+insert into books values('9783181484118','Polirom','/home/cip/Programs/RC/Proiect/18.txt',2001,9,0,11);
+insert into books values('9789734608815','Polirom','/home/cip/Programs/RC/Proiect/19.txt',2008,4,0,21);
 
-insert into books values('9783181484118','Polirom','~/home/Programs/RC/Proiect/18.txt',2001,9,0,11);
-insert into books values('9789734608815','Polirom','~/home/Programs/RC/Proiect/19.txt',2008,4,0,21);
-
-insert into books values('9789731908052','PriorBooks','~/home/Programs/RC/Proiect/20.txt',2011,8,0,22);
+insert into books values('9789731908052','PriorBooks','/home/cip/Programs/RC/Proiect/20.txt',2011,8,0,22);
 
 create view PreviewInformation as
 select title, volume, firstName, secondName, isbn, publisher, publicationYear, genre, subgenre, rating

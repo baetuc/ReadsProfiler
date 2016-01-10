@@ -3,6 +3,9 @@
 #pragma once
 #include <QDialog>
 #include<Socket.h>
+#include<string>
+
+using namespace std;
 
 namespace Ui {
 class Dialog;
@@ -13,11 +16,15 @@ class Dialog : public QDialog, public Socket
     Q_OBJECT
 
 public:
-    explicit Dialog(QWidget *parent = 0);
+    explicit Dialog(string username = "", QWidget *parent = 0);
     ~Dialog();
+
+    string username;
 
 private slots:
     void on_cauta_clicked();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::Dialog *ui;

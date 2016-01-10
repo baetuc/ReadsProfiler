@@ -335,7 +335,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Logat ca:</string>
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton">

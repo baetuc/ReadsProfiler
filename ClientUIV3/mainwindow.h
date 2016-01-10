@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <Socket.h>
+#include<string>
+
+using namespace std;
 
 namespace Ui {
 class MainWindow;
@@ -13,8 +16,10 @@ class MainWindow : public QMainWindow, public Socket
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(int sd = 0, bool connected = false, string username = "", QWidget *parent = 0);
     ~MainWindow();
+
+    string username;
 
 private slots:
 

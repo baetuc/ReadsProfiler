@@ -25,10 +25,13 @@
 
 using namespace std;
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(int sd, bool connected, string username, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    this->sd = sd;
+    this->connected = connected;
+    this->username = username;
     ui->setupUi(this);
     ui->lineEdit->setVisible(false);
     ui->lineEdit_2->setVisible(false);
@@ -90,7 +93,8 @@ void MainWindow::on_pushButton_clicked()
                         return;
             case USER_PASSWORD_OK :
                         QMessageBox::information(this, "SUCCESS", "Loginul a avut loc cu succes!");
-                        Dialog l;
+                        this->username = user.getUsername();
+                        Dialog l(this->username);
                         l.setVisible(true);
                         this->setVisible(false);
                         l.sd = this->sd;

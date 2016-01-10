@@ -31,6 +31,10 @@ private:
     static string getStatementForAuthors(Creation creation, bool& addedSomething);
     static string getStatementForGenres(Creation creation, bool& addedSomething);
     static string getStatementForSubgenres(Creation creation, bool& addedSomething);
+    static string getStatementForPublisher(Book book, bool& addedSomething);
+    static string getStatementForISBNQuery(Book book, bool& addedSomething);
+    static string getStatementForYear(Book book, bool& addedSomething);
+    static string getStatementForRating(Book book, bool& addedSomething);
     static string getStatementForISBN(Book query);
     static list<string> getISBNForBooksThatMatchTheQuery(Book query, sqlite3* database);
     static string getStringFromISBN(string ISBN, sqlite3* database, string field);
@@ -148,6 +152,51 @@ string DatabaseQueries::getStatementForSubgenres(Creation creation, bool& addedS
     return statement;
 }
 
+string DatabaseQueries::getStatementForPublisher(Book book, bool& addedSomething) {
+    string statement;
+    if(!book.getPublisher().empty()) {
+        statement += addedSomething == true ? " and " : " where ";
+        statement += " publisher = '";
+        statement += book.getPublisher();
+        statement += "' ";
+        addedSomething = true;
+    }
+    return statement;
+}
+
+string DatabaseQueries::getStatementForISBNQuery(Book book, bool& addedSomething) {
+    string statement;
+    if(!book.getISBN().empty()) {
+        statement += addedSomething == true ? " and " : " where ";
+        statement += " ISBN = '";
+        statement += book.getPublisher();
+        statement += "' ";
+        addedSomething = true;
+    }
+    return statement;
+}
+
+string DatabaseQueries::getStatementForYear(Book book, bool& addedSomething) {
+    string statement;
+    if(book.getPublicationYear()) {
+        statement += addedSomething == true ? " and " : " where ";
+        statement += " publicationYear = ";
+        statement += Utility::getStringForNumber((int) book.getPublicationYear());
+        addedSomething = true;
+    }
+    return statement;
+}
+string DatabaseQueries::getStatementForRating(Book book, bool& addedSomething) {
+    string statement;
+    if(book.getRating()) {
+        statement += addedSomething == true ? " and " : " where ";
+        statement += " rating >= ";
+        statement += Utility::getStringForFloat(book.getRating());
+        addedSomething = true;
+    }
+    return statement;
+}
+
 /* First we will select the ISBNs of the books that match the
     query. */
 string DatabaseQueries::getStatementForISBN(Book query) {
@@ -160,7 +209,12 @@ string DatabaseQueries::getStatementForISBN(Book query) {
     statement += getStatementForAuthors(creation, addedSomething);
     statement += getStatementForGenres(creation, addedSomething);
     statement += getStatementForSubgenres(creation, addedSomething);
+    statement += getStatementForPublisher(query, addedSomething);
+    statement += getStatementForISBNQuery(query, addedSomething);
+    statement += getStatementForYear(query, addedSomething);
+    statement += getStatementForRating(query, addedSomething);
     statement += ";";
+    cout << statement << '\n';
     return statement;
 }
 
@@ -239,7 +293,7 @@ list<Author> DatabaseQueries::getAuthorsFromISBN(string ISBN, sqlite3* database)
     Author author;
 
     const char* statement;
-    string statementString = "select firstName, secondName from previewInformation where ISBN='";
+    string statementString = "select distinct firstName, secondName from previewInformation where ISBN='";
     statementString += ISBN;
     statementString += "';";
     statement = statementString.c_str();
@@ -418,6 +472,7 @@ string DatabaseQueries::getPath(string ISBN) {
     string statement = "select path from books where ISBN='";
     statement += ISBN;
     statement += "';";
+    //cout << "Path query: " << statement << '\n';
 
     response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
     if (response != SQLITE_OK) {

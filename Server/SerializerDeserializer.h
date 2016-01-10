@@ -114,6 +114,7 @@ Creation SerializerDeserializer::deserializeCreation(string serializedCreation) 
 
     // Now we split by semicolon, to determine the authors.
     substrings = Utility::splitString(current, ';', authorsNumber + 1);
+
     list<Author> authors;
     for(int i = 0; i < authorsNumber && i < substrings.size(); ++i) {
         Author author = deserializeAuthor(substrings[i]);
@@ -137,9 +138,11 @@ Creation SerializerDeserializer::deserializeCreation(string serializedCreation) 
     substrings = Utility::splitString(current, ',', 2);
     int numberOfSubgenres = atoi(substrings[0].c_str());
     list<string> subgenres;
-    substrings = Utility::splitString(substrings[1], ',', numberOfSubgenres +1);
-    for(int i = 0; i < numberOfSubgenres && i < substrings.size(); ++i) {
-        subgenres.push_back(substrings[i]);
+    if(numberOfSubgenres > 0) {
+        substrings = Utility::splitString(substrings[1], ',', numberOfSubgenres +1);
+        for(int i = 0; i < numberOfSubgenres && i < substrings.size(); ++i) {
+            subgenres.push_back(substrings[i]);
+        }
     }
     creation.setSubgenres(subgenres);
 
@@ -170,11 +173,13 @@ Book SerializerDeserializer::deserializeBook(string serializedBook) {
     Book book;
     vector<string> substrings;
     string current;
+
     substrings = Utility::splitString(serializedBook, '#', 2);
 
     //First part is the serialized creation.
     book.setCreation(deserializeCreation(substrings[0]));
     current = substrings[1];
+
     // Split by comma, to get the length of the ISBN
     substrings = Utility::splitString(current, ',', 2);
     int substringLength = atoi(substrings[0].c_str());
@@ -186,15 +191,14 @@ Book SerializerDeserializer::deserializeBook(string serializedBook) {
     substringLength = atoi(substrings[0].c_str());
     book.setPublisher(substrings[1].substr(0, substringLength));
     current = substrings[1].substr(substringLength, string::npos);
-
     // Get the publication year
+
     substrings = Utility::splitString(current, ',', 2);
     book.setPublicationYear((unsigned int)atoi(substrings[0].c_str()));
     current = substrings[1];
 
     // Get the rating
     book.setRating((float)atof(current.c_str()));
-
     return book;
 }
 
