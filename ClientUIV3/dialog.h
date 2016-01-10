@@ -1,0 +1,25 @@
+#ifndef Dialog_H
+#define Dialog_H
+#pragma once
+#include <QDialog>
+#include<Socket.h>
+
+namespace Ui {
+class Dialog;
+}
+
+class Dialog : public QDialog, public Socket
+{
+    Q_OBJECT
+
+public:
+    explicit Dialog(QWidget *parent = 0);
+    ~Dialog();
+
+private slots:
+    void on_cauta_clicked();
+
+private:
+    Ui::Dialog *ui;
+};
+#endif // Dialog2_H
