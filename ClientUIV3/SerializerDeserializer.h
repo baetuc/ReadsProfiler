@@ -9,6 +9,7 @@
 #include "User.h"
 #include "Rating.h"
 #include "Utility.h"
+#include<SearchInfo.h>
 
 using namespace std;
 
@@ -27,4 +28,6 @@ public:
     static User deserializeUser(string);
     static string serializeRating(Rating);
     static Rating deserializeRating(string);
+    static string serializeSearch(SearchInfo);
+    static SearchInfo deserializeSearch(string);
 };

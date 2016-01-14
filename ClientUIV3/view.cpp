@@ -196,8 +196,18 @@ void View::on_pushButton_3_clicked()
     Rating rating;
     rating.setISBN(this->book.getISBN());
     rating.setRating(ui->spinBox->value());
+    rating.setUsername(this->username);
 
     string serializedRating = SerializerDeserializer::serializeRating(rating);
     Reader::sendMessageToServer(sd, (MainWindow*)this->parent(), serializedRating);
-    // Receive message that lets you know if you have the right to rate or not :D
+    string response = Reader::receiveMessageFromServer(sd, (MainWindow*) this->parent());
+    if(response == "0") {
+        QMessageBox::information(this, "Info", "Ratingul pentru această carte a fost înregistrat");
+    }
+    else {
+        string final = "Ați mai dat rate acestei cărți o dată! Ratingul precedent: ";
+        final += response;
+        final += ".";
+        QMessageBox::warning(this, "WARNING", final.c_str());
+    }
 }

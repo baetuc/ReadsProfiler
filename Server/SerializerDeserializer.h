@@ -12,6 +12,7 @@
 #include "User.h"
 #include "Rating.h"
 #include "Utility.h"
+#include "SearchInfo.h"
 
 using namespace std;
 
@@ -30,6 +31,8 @@ public:
     static User deserializeUser(string);
     static string serializeRating(Rating);
     static Rating deserializeRating(string);
+    static string serializeSearch(SearchInfo);
+    static SearchInfo deserializeSearch(string);
 };
 
 string SerializerDeserializer::serializeAuthor(Author author) {
@@ -218,6 +221,9 @@ list<Book> SerializerDeserializer::deserializeBookList(string serializedBooks) {
     string current;
     vector<string> substrings = Utility::splitString(serializedBooks, ',', 2);
     int listSize = atoi(substrings[0].c_str());
+    if(listSize == 0) {
+        return result;
+    }
     current = substrings[1];
     substrings = Utility::splitString(current, '`', listSize);
     for(int i = 0; i < listSize; ++i) {
@@ -246,6 +252,9 @@ string SerializerDeserializer::serializeRating(Rating rating) {
     result += Utility::getStringForNumber(rating.getISBN().size());
     result += ",";
     result += rating.getISBN();
+    result += Utility::getStringForNumber(rating.getUsername().size());
+    result += ",";
+    result += rating.getUsername();
     result += Utility::getStringForNumber(rating.getRating());
     return result;
 }
@@ -255,6 +264,28 @@ Rating SerializerDeserializer::deserializeRating(string serializedRating) {
     vector<string> substrings = Utility::splitString(serializedRating, ',', 2);
     int ISBNLength = atoi(substrings[0].c_str());
     rating.setISBN(substrings[1].substr(0, ISBNLength));
-    rating.setRating(atoi(substrings[1].substr(ISBNLength, string::npos).c_str()));
+    string current = substrings[1].substr(ISBNLength, string::npos);
+    substrings = Utility::splitString(current, ',', 2);
+    int usernameLength = atoi(substrings[0].c_str());
+    rating.setUsername(substrings[1].substr(0, usernameLength));
+    rating.setRating(atoi(substrings[1].substr(usernameLength, string::npos).c_str()));
     return rating;
+}
+
+string SerializerDeserializer::serializeSearch(SearchInfo search) {
+    string result = Utility::getStringForNumber(search.getUsername().size());
+    result += ",";
+    result += search.getUsername();
+    result += serializeBook(search.getQuery());
+    return result;
+}
+
+SearchInfo SerializerDeserializer::deserializeSearch(string serializedSearch) {
+    SearchInfo search;
+    vector<string> substrings = Utility::splitString(serializedSearch, ',', 2);
+    int usernameLength = atoi(substrings[0].c_str());
+    string current = substrings[1];
+    search.setUsername(current.substr(0, usernameLength));
+    search.setQuery(deserializeBook(current.substr(usernameLength)));
+    return search;
 }

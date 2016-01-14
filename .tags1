@@ -1,0 +1,27 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	0	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+DISCONNECT	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define DISCONNECT /;"	macro	line:11
+CONNECT	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define CONNECT /;"	macro	line:12
+CREATE_USER	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define CREATE_USER /;"	macro	line:13
+SEARCH	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define SEARCH /;"	macro	line:14
+FETCH	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define FETCH /;"	macro	line:15
+RATE	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define RATE /;"	macro	line:16
+RECOMMEND	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define RECOMMEND /;"	macro	line:17
+USER_PASSWORD_OK	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define USER_PASSWORD_OK /;"	macro	line:19
+WRONG_PASSWORD	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define WRONG_PASSWORD /;"	macro	line:20
+WRONG_USERNAME	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define WRONG_USERNAME /;"	macro	line:21
+USER_EXISTS	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define USER_EXISTS /;"	macro	line:23
+USER_NO_EXISTS	/home/cip/Programs/RC/Proiect/Server/Server.h	/^#define USER_NO_EXISTS /;"	macro	line:24
+Server	/home/cip/Programs/RC/Proiect/Server/Server.h	/^class Server {$/;"	class	line:28
+connect	/home/cip/Programs/RC/Proiect/Server/Server.h	/^void Server::connect(ThreadInformation* data) {$/;"	function	line:42	class:Server	signature:(ThreadInformation* data)
+createUser	/home/cip/Programs/RC/Proiect/Server/Server.h	/^void Server::createUser(ThreadInformation* data) {$/;"	function	line:95	class:Server	signature:(ThreadInformation* data)
+search	/home/cip/Programs/RC/Proiect/Server/Server.h	/^void Server::search(ThreadInformation* data) {$/;"	function	line:143	class:Server	signature:(ThreadInformation* data)
+fetch	/home/cip/Programs/RC/Proiect/Server/Server.h	/^void Server::fetch(ThreadInformation* data) {$/;"	function	line:191	class:Server	signature:(ThreadInformation* data)
+rate	/home/cip/Programs/RC/Proiect/Server/Server.h	/^void Server::rate(ThreadInformation* data) {$/;"	function	line:252	class:Server	signature:(ThreadInformation* data)
+recommend	/home/cip/Programs/RC/Proiect/Server/Server.h	/^void Server::recommend(ThreadInformation* data) {$/;"	function	line:280	class:Server	signature:(ThreadInformation* data)
+communicate	/home/cip/Programs/RC/Proiect/Server/Server.h	/^void Server::communicate(ThreadInformation* data){$/;"	function	line:284	class:Server	signature:(ThreadInformation* data)
+execute	/home/cip/Programs/RC/Proiect/Server/Server.h	/^void* Server::execute(void* argument) {$/;"	function	line:334	class:Server	signature:(void* argument)

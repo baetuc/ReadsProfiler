@@ -10,6 +10,7 @@
 #include "DatabaseQueries.h"
 #include "SerializerDeserializer.h"
 #include "ThreadInformation.h"
+#include "Recommender.h"
 
 #define ERR_MSG 0
 #define OK_MSG 1
@@ -161,10 +162,11 @@ void Server::search(ThreadInformation* data) {
     int client = data->getClient();
     int threadId = data->getThreadId();
 
-    string serializedBook = receiveMessageFromClient(threadId, client);
-    cout << serializedBook << '\n';
-    Book book = SerializerDeserializer::deserializeBook(serializedBook);
-    list<Book> response = DatabaseQueries::getResponseToQuery(book);
+    string serializedSearch = receiveMessageFromClient(threadId, client);
+    cout << serializedSearch << '\n';
+    SearchInfo search = SerializerDeserializer::deserializeSearch(serializedSearch);
+    list<Book> response = DatabaseQueries::getResponseToQuery(search.getQuery());
+    DatabaseQueries::saveQuery(search);
     string serializedBooks = SerializerDeserializer::serializeBookList(response);
     sendMessageToClient(threadId, client, serializedBooks, false);
 }
@@ -234,12 +236,23 @@ void Server::rate(ThreadInformation* data) {
     int threadId = data->getThreadId();
 
     string serializedRating = receiveMessageFromClient(threadId, client);
+    cout << "Rating: " << serializedRating << '\n';
     Rating rating = SerializerDeserializer::deserializeRating(serializedRating);
-    DatabaseQueries::rateBook(rating.getRating(), rating.getISBN());
+    cout << "Rate received: " << rating.getRating() << '\n';
+    string response = DatabaseQueries::rateBook(rating.getRating(), rating.getISBN(), rating.getUsername());
+    sendMessageToClient(threadId, client, response, false);
 }
 
 void Server::recommend(ThreadInformation* data) {
-
+    int client = data->getClient();
+    int threadId = data->getThreadId();
+    string username = receiveMessageFromClient(threadId, client);
+    cout << "Username: " << username << '\n';
+    Recommender recommender(username);
+    list<string> recommendedISBNs = recommender.recommendBooks();
+    list<Book> result = DatabaseQueries::getBooksFromISBNList(recommendedISBNs);
+    string serializedBooks = SerializerDeserializer::serializeBookList(result);
+    sendMessageToClient(threadId, client, serializedBooks, false);
 }
 
 void Server::communicate(ThreadInformation* data){

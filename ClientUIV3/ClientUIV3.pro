@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     Utility.cpp \
     dialog.cpp \
     search.cpp \
-    view.cpp
+    view.cpp \
+    SearchInfo.cpp
 
 HEADERS  += mainwindow.h \
     Reader.h \
@@ -40,7 +41,8 @@ HEADERS  += mainwindow.h \
     Utility.h \
     dialog.h \
     search.h \
-    view.h
+    view.h \
+    SearchInfo.h
 
 FORMS    += mainwindow.ui \
     dialog.ui \

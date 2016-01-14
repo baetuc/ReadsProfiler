@@ -26,6 +26,8 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_recomanda_clicked();
+
 private:
     Ui::Dialog *ui;
 };

@@ -7,15 +7,17 @@
 #include <cstring>
 #include <iostream>
 #include <list>
+#include <map>
 #include "sqlite3.h"
 #include <stdlib.h>
 #include "Book.h"
 #include "Author.h"
 #include "Creation.h"
 #include "Utility.h"
+#include "SearchInfo.h"
 
 #define DATABASE "Books.db"
-#define USERS "Users.db"
+#pragma once
 
 using namespace std;
 
@@ -39,17 +41,30 @@ private:
     static list<string> getISBNForBooksThatMatchTheQuery(Book query, sqlite3* database);
     static string getStringFromISBN(string ISBN, sqlite3* database, string field);
     static int getIntFromISBN(string ISBN, sqlite3* database, string field);
-    static double getDoubleFromISBN(string ISBN, sqlite3* database, string field);
+    static double getRatingFromISBN(string ISBN, sqlite3* database);
     static list<string> getListOfStringFromISBN(string ISBN, sqlite3* database, string field);
     static list<Author> getAuthorsFromISBN(string ISBN, sqlite3* database);
     static Book getBookFromISBN(string ISBN, sqlite3* database);
 
+    static void saveGenres(string username, list<string> genres, sqlite3* database);
+    static void saveSubgenres(string username, list<string> subgenres, sqlite3* database);
+    static void saveAuthors(string username, list<Author> authors, sqlite3* database);
+
+
 public:
     static list<Book> getResponseToQuery(Book query);
-    static void rateBook(int rate, string ISBN); // method that updates book rating
+    static void saveQuery(SearchInfo search);
+    static list<string> getTopBooks(int top);
+    static list<Book> getBooksFromISBNList(list<string> ISBN);
+    static map<string, int> getStringStatisticForUser(string username, string field);
+    static map<int, int> getIntStatisticForUser(string username, string field);
+    static map<string, int> getBookRatesForUser(string username);
+    static list<string> getOtherActiveUsers(string username);
+    static string rateBook(int rate, string ISBN, string username); // method that updates book rating
     static string getPath(string ISBN); // method that returns book's path
     static bool getPasswordForUser(string user, string& password);
     static bool createUser(string user, string password);
+
 };
 
 string DatabaseQueries::getStatementForTitle(Creation creation, bool& addedSomething) {
@@ -214,7 +229,7 @@ string DatabaseQueries::getStatementForISBN(Book query) {
     statement += getStatementForYear(query, addedSomething);
     statement += getStatementForRating(query, addedSomething);
     statement += ";";
-    cout << statement << '\n';
+    cout << "Statement for ISBN: " << statement << '\n';
     return statement;
 }
 
@@ -338,11 +353,9 @@ list<string> DatabaseQueries::getListOfStringFromISBN(string ISBN, sqlite3* data
     return result;
 }
 
-double DatabaseQueries::getDoubleFromISBN(string ISBN, sqlite3* database, string field) {
+double DatabaseQueries::getRatingFromISBN(string ISBN, sqlite3* database) {
     const char* statement;
-    string statementString = "select distinct ";
-    statementString += field;
-    statementString += " from previewInformation where ISBN='";
+    string statementString = "select avg(rating) from userRating where ISBN='";
     statementString += ISBN;
     statementString += "';";
     statement = statementString.c_str();
@@ -351,8 +364,8 @@ double DatabaseQueries::getDoubleFromISBN(string ISBN, sqlite3* database, string
     double result;
     response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        throw Utility::concatenateStrings("SELECT failed FLOAT: ", sqlite3_errmsg(database), "\n");
-        exit(0); // TODO: think about throw?
+        throw Utility::concatenateStrings("SELECT rating failed: ", sqlite3_errmsg(database), "\n");
+        exit(0);
     }
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         result = sqlite3_column_double(stmt, 0);
@@ -374,9 +387,28 @@ Book DatabaseQueries::getBookFromISBN(string ISBN, sqlite3* database) {
     book.setISBN(ISBN);
     book.setPublisher(getStringFromISBN(ISBN, database, "publisher"));
     book.setPublicationYear((unsigned int) getIntFromISBN(ISBN, database, "publicationYear"));
-    book.setRating((float) getDoubleFromISBN(ISBN, database, "rating"));
+    book.setRating(getRatingFromISBN(ISBN, database));
 
     return book;
+}
+
+list<Book> DatabaseQueries::getBooksFromISBNList(list<string> ISBN) {
+    sqlite3* database;
+    int response;
+
+    /* Open database */
+    response = sqlite3_open(DATABASE, &database);
+    if(response){
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
+    }
+
+    list<Book>result;
+    for(list<string>::iterator it = ISBN.begin(); it != ISBN.end(); ++it) {
+        result.push_back(getBookFromISBN(*it, database));
+        cout << SerializerDeserializer::serializeBook(getBookFromISBN(*it, database)) << '\n';
+    }
+    sqlite3_close(database);
+    return result;
 }
 
 list<Book> DatabaseQueries::getResponseToQuery(Book query) {
@@ -400,7 +432,121 @@ list<Book> DatabaseQueries::getResponseToQuery(Book query) {
     return result;
 }
 
-void DatabaseQueries::rateBook(int rate, string ISBN) {
+void DatabaseQueries::saveGenres(string username, list<string> genres, sqlite3* database) {
+    string genreStatement = "insert into userPreferences values('";
+    genreStatement += username;
+    genreStatement += "','";
+    string finalGenreStatement = "', null, null);";
+    for(list<string>::iterator it = genres.begin(); it != genres.end(); ++it) {
+        string statementString = genreStatement;
+        statementString += *it;
+        statementString += finalGenreStatement;
+        const char* statement = statementString.c_str();
+        sqlite3_stmt *stmt;
+        int response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+        if (response != SQLITE_OK) {
+            throw Utility::concatenateStrings("INSERT genre failed: ", sqlite3_errmsg(database), "\n");
+            exit(0);
+        }
+        if (sqlite3_step(stmt) != SQLITE_DONE) {
+            throw Utility::concatenateStrings("INSERT genre failed: ", sqlite3_errmsg(database), "\n");
+        }
+        sqlite3_finalize(stmt);
+    }
+}
+
+void DatabaseQueries::saveSubgenres(string username, list<string> subgenres, sqlite3* database) {
+    string subgenreStatement = "insert into userPreferences values('";
+    subgenreStatement += username;
+    subgenreStatement += "',null,'";
+    string finalSubgenreStatement = "', null);";
+    for(list<string>::iterator it = subgenres.begin(); it != subgenres.end(); ++it) {
+        string statementString = subgenreStatement;
+        statementString += *it;
+        statementString += finalSubgenreStatement;
+        const char* statement = statementString.c_str();
+        sqlite3_stmt *stmt;
+        int response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+        if (response != SQLITE_OK) {
+            throw Utility::concatenateStrings("INSERT subgenre failed: ", sqlite3_errmsg(database), "\n");
+            exit(0);
+        }
+
+        if (sqlite3_step(stmt) != SQLITE_DONE) {
+            throw Utility::concatenateStrings("INSERT subgenre failed: ", sqlite3_errmsg(database), "\n");
+        }
+        sqlite3_finalize(stmt);
+    }
+}
+
+void DatabaseQueries::saveAuthors(string username, list<Author> authors, sqlite3* database) {
+    string authorStatement = "insert into userPreferences values('";
+    authorStatement += username;
+    authorStatement += "',null, null,";
+    string finalAuthorStatement = ");";
+    for(list<Author>::iterator it = authors.begin(); it != authors.end(); ++it) {
+        // find the autID for those authors;
+        string autIDStatement = "select autID from authors where firstName='";
+        autIDStatement += it->getFirstName();
+        autIDStatement += "' and secondName = '";
+        autIDStatement += it->getSecondName();
+        autIDStatement += "';";
+
+        sqlite3_stmt *stmt;
+        int response = sqlite3_prepare_v2(database, autIDStatement.c_str(), -1, &stmt, NULL);
+        if (response != SQLITE_OK) {
+            throw Utility::concatenateStrings("SELECT autID failed: ", sqlite3_errmsg(database), "\n");
+            exit(0);
+        }
+        int autID = 0; // default for not found
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            autID = sqlite3_column_int(stmt, 0);
+            cout << "Author ID is: " << autID << '\n';
+        }
+        sqlite3_finalize(stmt);
+
+        sqlite3_stmt* stmt2;
+
+        string statementString = authorStatement;
+        statementString += Utility::getStringForNumber(autID);
+        statementString += finalAuthorStatement;
+        const char* statement = statementString.c_str();
+
+        response = sqlite3_prepare_v2(database, statement, -1, &stmt2, NULL);
+        if (response != SQLITE_OK) {
+            throw Utility::concatenateStrings("INSERT autID failed: ", sqlite3_errmsg(database), "\n");
+            exit(0);
+        }
+
+        if (sqlite3_step(stmt2) != SQLITE_DONE) {
+
+            throw Utility::concatenateStrings("INSERT autID failed: ", sqlite3_errmsg(database), "\n");
+        }
+        sqlite3_finalize(stmt2);
+    }
+}
+
+void DatabaseQueries::saveQuery(SearchInfo search) {
+    sqlite3* database;
+
+    /* Open database */
+    int response = sqlite3_open(DATABASE, &database);
+    if(response){
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
+    }
+
+    string username = search.getUsername();
+    Book book = search.getQuery();
+    saveGenres(username, book.getCreation().getGenres(), database);
+    saveSubgenres(username, book.getCreation().getSubgenres(), database);
+    saveAuthors(username, book.getCreation().getAuthors(), database);
+
+    sqlite3_close(database);
+}
+
+// Method that returns previous rating from a user on a specific book, if he rated
+// that book, otherwise 0
+string DatabaseQueries::rateBook(int rate, string ISBN, string username) {
     sqlite3* database;
     int response;
     sqlite3_stmt *stmt;
@@ -410,52 +556,239 @@ void DatabaseQueries::rateBook(int rate, string ISBN) {
     if(response){
         throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
     }
-    int numberOfRates;
-    double oldRate;
-    string statement = "select numberOfRates from books where ISBN='";
+    int rating = 0;
+    string statement = "select rating from userRating where ISBN='";
     statement += ISBN;
+    statement += "' and username='";
+    statement += username;
     statement += "';";
 
     response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        throw Utility::concatenateStrings("SELECT failed: ", sqlite3_errmsg(database), "\n");
+        throw Utility::concatenateStrings("SELECT rate count failed: ", sqlite3_errmsg(database), "\n");
     }
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        numberOfRates = sqlite3_column_int(stmt, 0);
+        rating = sqlite3_column_int(stmt, 0);
     }
     sqlite3_finalize(stmt);
 
+    if (rating != 0) {
+        // send to the user the message that he cannot rate anymore that book
+        return Utility::getStringForNumber(rating);
+    }
+
+    // else, the user didn't rate that book before
     sqlite3_stmt *stmt2;
-    statement = "select rating from books where ISBN='";
+    statement = "insert into userRating values('";
+    statement += username;
+    statement += "','";
     statement += ISBN;
-    statement += "';";
+    statement += "',";
+    statement += Utility::getStringForNumber(rate);
+    statement += ");";
     response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt2, NULL);
     if (response != SQLITE_OK) {
-        throw Utility::concatenateStrings("SELECT failed: ", sqlite3_errmsg(database), "\n");
+        throw Utility::concatenateStrings("INSERT rate failed: ", sqlite3_errmsg(database), "\n");
     }
-    if (sqlite3_step(stmt2) == SQLITE_ROW) {
-        oldRate = sqlite3_column_double(stmt2, 0);
+    if (sqlite3_step(stmt2) != SQLITE_DONE) {
+        throw Utility::concatenateStrings("INSERT rate failed: ", sqlite3_errmsg(database), "\n");
     }
     sqlite3_finalize(stmt2);
 
-    double newRating = (oldRate * (double) numberOfRates + (double)rate)/ (double)(numberOfRates + 1);
-    statement = "update books set numberOfRates=numberOfRates+1, rating=";
-    statement += Utility::getStringForFloat((float) newRating);
-    statement += " where ISBN='";
-    statement += ISBN;
+    sqlite3_close(database);
+    return "0";
+}
+
+// ------------------------------------ RECOMMEND -----------------------------------------
+
+list<string> DatabaseQueries::getTopBooks(int top) {
+    list<string> result;
+
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt;
+
+    /* Open database */
+    response = sqlite3_open(DATABASE, &database);
+    if(response){
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
+    }
+    int rating = 0;
+    string auxStatement = "select isbn from previewInformation order by rating desc limit ";
+    auxStatement += Utility::getStringForNumber(top);
+    auxStatement += ";";
+
+    const char* statement = auxStatement.c_str();
+
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        throw Utility::concatenateStrings("SELECT top books failed: ", sqlite3_errmsg(database), "\n");
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+
+        int length = sqlite3_column_bytes(stmt, 1);
+        if(length > 0) {
+            char* isbn = (char*)(sqlite3_column_text(stmt, 1));
+            cout << "Found adding isbn: " << isbn << '\n';
+            result.push_back(string(isbn));
+        }
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(database);
+    return result;
+}
+
+map<string, int> DatabaseQueries::getStringStatisticForUser(string username, string field) {
+    map<string, int> statistic;
+
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt;
+
+    /* Open database */
+    response = sqlite3_open(DATABASE, &database);
+    if(response){
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
+    }
+    int rating = 0;
+    string auxStatement = "select count(*),";
+    auxStatement += field;
+    auxStatement += " from userPreferences where username='";
+    auxStatement += username;
+    auxStatement += "' group by ";
+    auxStatement += field;
+    auxStatement += ";";
+    const char* statement = auxStatement.c_str();
+
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        throw Utility::concatenateStrings("SELECT string statistic failed: ", sqlite3_errmsg(database), "\n");
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int count = sqlite3_column_int(stmt, 0);
+
+        int length = sqlite3_column_bytes(stmt, 1);
+        if(length > 0) {
+            char* result = (char*)(sqlite3_column_text(stmt, 1));
+            statistic[string(result)] = count;
+        }
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(database);
+    return statistic;
+}
+
+map<int, int> DatabaseQueries::getIntStatisticForUser(string username, string field) {
+    map<int, int> statistic;
+
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt;
+
+    /* Open database */
+    response = sqlite3_open(DATABASE, &database);
+    if(response){
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
+    }
+    int rating = 0;
+    string auxStatement = "select count(*),";
+    auxStatement += field;
+    auxStatement += " from userPreferences where username='";
+    auxStatement += username;
+    auxStatement += "' group by ";
+    auxStatement += field;
+    auxStatement += ";";
+    const char* statement = auxStatement.c_str();
+
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        throw Utility::concatenateStrings("SELECT int statistic failed: ", sqlite3_errmsg(database), "\n");
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int count = sqlite3_column_int(stmt, 0);
+
+        int autID = sqlite3_column_int(stmt, 1);
+        statistic[autID] = count;
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(database);
+    return statistic;
+}
+
+map<string, int> DatabaseQueries::getBookRatesForUser(string username) {
+    map<string, int> statistic;
+
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt;
+
+    /* Open database */
+    response = sqlite3_open(DATABASE, &database);
+    if(response){
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
+    }
+    string auxStatement = "select rating, isbn from userRating where username='";
+    auxStatement += username;
+    auxStatement += "';";
+    const char* statement = auxStatement.c_str();
+
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        throw Utility::concatenateStrings("SELECT book rates failed: ", sqlite3_errmsg(database), "\n");
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int rating = sqlite3_column_int(stmt, 0);
+
+        int length = sqlite3_column_bytes(stmt, 1);
+        if(length > 0) {
+            char* isbn = (char*)(sqlite3_column_text(stmt, 1));
+            statistic[string(isbn)] = rating;
+        }
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(database);
+    return statistic;
+}
+
+list<string> DatabaseQueries::getOtherActiveUsers(string username) {
+    list<string> users;
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt;
+
+    /* Open database */
+    response = sqlite3_open(DATABASE, &database);
+    if(response){
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
+    }
+
+    string statement = "select distinct username from userRating where username != '";
+    statement += username;
     statement += "';";
 
-    sqlite3_stmt *stmt3;
-    response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt3, NULL);
+    response = sqlite3_prepare_v2(database, statement.c_str(), -1, &stmt, NULL);
     if (response != SQLITE_OK) {
-        throw Utility::concatenateStrings("UPDATE failed: ", sqlite3_errmsg(database), "\n");
+        throw Utility::concatenateStrings("SELECT usernames failed: ", sqlite3_errmsg(database), "\n");
     }
-    if (sqlite3_step(stmt3) != SQLITE_DONE) {
-        throw Utility::concatenateStrings("UPDATE failed: ", sqlite3_errmsg(database), "\n");
+    string resultInString;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int length = sqlite3_column_bytes(stmt, 0);
+        if(length > 0) {
+            char* result = (char*)(sqlite3_column_text(stmt, 0));
+            resultInString.assign(result, length);
+            users.push_back(resultInString);
+        }
     }
-    sqlite3_finalize(stmt3);
+    sqlite3_finalize(stmt);
     sqlite3_close(database);
+    return users;
 }
+
+// --------------------------------- END OF RECOMMEND -------------------------------------
 
 
 string DatabaseQueries::getPath(string ISBN) {
@@ -496,7 +829,7 @@ bool DatabaseQueries::getPasswordForUser(string userName, string& password) {
     sqlite3_stmt *stmt;
 
     /* Open database */
-    response = sqlite3_open(USERS, &database);
+    response = sqlite3_open(DATABASE, &database);
     if(response){
         throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
     }
@@ -530,7 +863,7 @@ bool DatabaseQueries::createUser(string userName, string password) {
     sqlite3_stmt *stmt, *stmt2;
 
     /* Open database */
-    response = sqlite3_open(USERS, &database);
+    response = sqlite3_open(DATABASE, &database);
     if(response){
         throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
     }

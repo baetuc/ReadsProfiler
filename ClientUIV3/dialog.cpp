@@ -14,6 +14,7 @@
 #include<search.h>
 
 #define SEARCH 3
+#define RECOMMEND 6
 
 using namespace std;
 
@@ -68,7 +69,10 @@ void Dialog::on_cauta_clicked() {
        book.setPublisher(ui->editura->text().toStdString());
        book.setRating(atoi(ui->rating->text().toStdString().c_str()));
 
-       string serializedBook = SerializerDeserializer::serializeBook(book);
+       SearchInfo searchInfo;
+       searchInfo.setUsername(this->username);
+       searchInfo.setQuery(book);
+       string serializedSearch = SerializerDeserializer::serializeSearch(searchInfo);
 
        uint32_t requestType = SEARCH;
        requestType = htonl(requestType);
@@ -76,7 +80,7 @@ void Dialog::on_cauta_clicked() {
            QMessageBox::warning(this, "WARNING", "Eroare la transmiterea cererii de search la server!");
            exit(0);
        }
-       Reader::sendMessageToServer(sd, (MainWindow*) this->parent(), serializedBook);
+       Reader::sendMessageToServer(sd, (MainWindow*) this->parent(), serializedSearch);
        Search search(sd, this->username);
        search.setVisible(true);
        this->setVisible(false);
@@ -95,4 +99,22 @@ void Dialog::on_pushButton_clicked()
     window->connected = this->connected;
     this->close();
     window->show();
+}
+
+void Dialog::on_recomanda_clicked()
+{
+    uint32_t requestType = RECOMMEND;
+    requestType = htonl(requestType);
+    if(write(sd, &requestType, sizeof(uint32_t)) < 0) {
+        QMessageBox::warning(this, "WARNING", "Eroare la transmiterea cererii de search la server!");
+        exit(0);
+    }
+    Reader::sendMessageToServer(sd, (MainWindow*) this->parent(), this->username);
+    Search search(sd, this->username);
+    search.setVisible(true);
+    this->setVisible(false);
+    search.sd = this->sd;
+    search.connected = this->connected;
+    this->close();
+    search.exec();
 }
