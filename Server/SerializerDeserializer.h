@@ -13,6 +13,7 @@
 #include "Rating.h"
 #include "Utility.h"
 #include "SearchInfo.h"
+#pragma once
 
 using namespace std;
 

@@ -4,9 +4,10 @@
 #include <list>
 #include <algorithm>
 #include <vector>
+#include "SerializerDeserializer.h"
 
 #define TOP_WANTED 10
-#define SCORE_THRESHOLD 5
+#define SCORE_THRESHOLD 0
 
 using namespace std;
 
@@ -35,98 +36,118 @@ public:
 
 double Recommender::computeGenreSpearmanDistance(Statistic primary, Statistic other) {
     // First we compute spearman distance for genre
-    map<string, int> primaryGenreTop = primary.getGenreTop();
-    map<string, int> otherGenreTop = other.getGenreTop();
+    map<string, int> primaryGenreRank = primary.getGenreRank();
+    map<string, int> otherGenreRank = other.getGenreRank();
+
+    int primaryBiggestRank = 0;
+    int otherBiggestRank = 0;
 
     set<string> impliedGenres;
-    for(map<string, int>::iterator it = primaryGenreTop.begin(); it != primaryGenreTop.end(); ++it) {
+    for(map<string, int>::iterator it = primaryGenreRank.begin(); it != primaryGenreRank.end(); ++it) {
         impliedGenres.insert(it->first);
+        primaryBiggestRank = it->second > primaryBiggestRank ? it -> second : primaryBiggestRank;
     }
-    for(map<string, int>::iterator it = otherGenreTop.begin(); it != otherGenreTop.end(); ++it) {
+    for(map<string, int>::iterator it = otherGenreRank.begin(); it != otherGenreRank.end(); ++it) {
         impliedGenres.insert(it->first);
+        otherBiggestRank = it->second > otherBiggestRank ? it -> second : otherBiggestRank;
     }
+
+    ++primaryBiggestRank;
+    ++otherBiggestRank;
 
     if(impliedGenres.size() < 2) {
         return 0;
     }
 
     double squareSum = 0;
-    for(map<string, int>::iterator it = primaryGenreTop.begin(); it != primaryGenreTop.end(); ++it) {
-        squareSum += (it->second - otherGenreTop[it->first]) * (it->second - otherGenreTop[it->first]);
-    }
-    for(map<string, int>::iterator it = otherGenreTop.begin(); it != otherGenreTop.end(); ++it) {
-        if(primaryGenreTop.find(it->first) == primaryGenreTop.end()) {
-            squareSum += (it->second - primaryGenreTop[it->first]) * (it->second - primaryGenreTop[it->first]);
-        }
-    }
 
-    return 1 - ((double)(6 * squareSum) / (impliedGenres.size() * impliedGenres.size() - 1));
+    for(set<string>::iterator it = impliedGenres.begin(); it != impliedGenres.end(); ++it) {
+        int primaryFactor = primaryGenreRank.find(*it) != primaryGenreRank.end() ? primaryGenreRank[*it] : primaryBiggestRank;
+        int otherFactor = otherGenreRank.find(*it) != otherGenreRank.end() ? otherGenreRank[*it] : otherBiggestRank;
+        cout << "Spearman " << " " << *it << " primary: " << primaryFactor << ", " << other.getUsername() << ": ";
+        cout << otherFactor << '\n';
+        squareSum += (primaryFactor - otherFactor) * (primaryFactor - otherFactor);
+    }
+    cout << "Square sum: " << squareSum << "\nn is: " << impliedGenres.size() << '\n';
+    return 1 - ((double)(6 * squareSum) / (impliedGenres.size() * (impliedGenres.size() * impliedGenres.size() - 1)));
 }
 
 double Recommender::computeSubgenreSpearmanDistance(Statistic primary, Statistic other) {
-    // First we compute spearman distance for genre
-    map<string, int> primarySubgenreTop = primary.getSubgenreTop();
-    map<string, int> otherSubgenreTop = other.getSubgenreTop();
+    map<string, int> primarySubgenreRank = primary.getSubgenreRank();
+    map<string, int> otherSubgenreRank = other.getSubgenreRank();
+
+    int primaryBiggestRank = 0;
+    int otherBiggestRank = 0;
 
     set<string> impliedSubgenres;
-    for(map<string, int>::iterator it = primarySubgenreTop.begin(); it != primarySubgenreTop.end(); ++it) {
+    for(map<string, int>::iterator it = primarySubgenreRank.begin(); it != primarySubgenreRank.end(); ++it) {
         impliedSubgenres.insert(it->first);
+        primaryBiggestRank = it->second > primaryBiggestRank ? it -> second : primaryBiggestRank;
     }
-    for(map<string, int>::iterator it = otherSubgenreTop.begin(); it != otherSubgenreTop.end(); ++it) {
+    for(map<string, int>::iterator it = otherSubgenreRank.begin(); it != otherSubgenreRank.end(); ++it) {
         impliedSubgenres.insert(it->first);
+        otherBiggestRank = it->second > otherBiggestRank ? it -> second : otherBiggestRank;
     }
+
+    ++primaryBiggestRank;
+    ++otherBiggestRank;
 
     if(impliedSubgenres.size() < 2) {
         return 0;
     }
 
     double squareSum = 0;
-    for(map<string, int>::iterator it = primarySubgenreTop.begin(); it != primarySubgenreTop.end(); ++it) {
-        squareSum += (it->second - otherSubgenreTop[it->first]) * (it->second - otherSubgenreTop[it->first]);
-    }
-    for(map<string, int>::iterator it = otherSubgenreTop.begin(); it != otherSubgenreTop.end(); ++it) {
-        if(primarySubgenreTop.find(it->first) == primarySubgenreTop.end()) {
-            squareSum += (it->second - primarySubgenreTop[it->first]) * (it->second - primarySubgenreTop[it->first]);
-        }
-    }
 
-    return 1 - ((double)(6 * squareSum) / (impliedSubgenres.size() * impliedSubgenres.size() - 1));
+    for(set<string>::iterator it = impliedSubgenres.begin(); it != impliedSubgenres.end(); ++it) {
+        int primaryFactor = primarySubgenreRank.find(*it) != primarySubgenreRank.end() ?
+                                                                        primarySubgenreRank[*it] : primaryBiggestRank;
+        int otherFactor = otherSubgenreRank.find(*it) != otherSubgenreRank.end() ? otherSubgenreRank[*it] : otherBiggestRank;
+        cout << "Spearman " << " " << *it << " primary: " << primaryFactor << ", " << other.getUsername() << ": ";
+        cout << otherFactor << '\n';
+        squareSum += (primaryFactor - otherFactor) * (primaryFactor - otherFactor);
+    }
+    cout << "Square sum: " << squareSum << "\nn is: " << impliedSubgenres.size() << '\n';
+    return 1 - ((double)(6 * squareSum) / (impliedSubgenres.size() * (impliedSubgenres.size() * impliedSubgenres.size() - 1)));
 }
 
 double Recommender::computeAuthorSpearmanDistance(Statistic primary, Statistic other) {
-    // First we compute spearman distance for genre
-    map<int, int> primaryAuthorTop = primary.getAuthorTop();
-    map<int, int> otherAuthorTop = other.getAuthorTop();
+    map<int, int> primaryAuthorRank = primary.getAuthorRank();
+    map<int, int> otherAuthorRank = other.getAuthorRank();
+
+    int primaryBiggestRank = 0;
+    int otherBiggestRank = 0;
 
     set<int> impliedAuthors;
-    for(map<int, int>::iterator it = primaryAuthorTop.begin(); it != primaryAuthorTop.end(); ++it) {
+    for(map<int, int>::iterator it = primaryAuthorRank.begin(); it != primaryAuthorRank.end(); ++it) {
         impliedAuthors.insert(it->first);
+        primaryBiggestRank = it->second > primaryBiggestRank ? it -> second : primaryBiggestRank;
     }
-    for(map<int, int>::iterator it = otherAuthorTop.begin(); it != otherAuthorTop.end(); ++it) {
+    for(map<int, int>::iterator it = otherAuthorRank.begin(); it != otherAuthorRank.end(); ++it) {
         impliedAuthors.insert(it->first);
+        otherBiggestRank = it->second > otherBiggestRank ? it -> second : otherBiggestRank;
     }
+
+    ++primaryBiggestRank;
+    ++otherBiggestRank;
 
     if(impliedAuthors.size() < 2) {
         return 0;
     }
 
     double squareSum = 0;
-    for(map<int, int>::iterator it = primaryAuthorTop.begin(); it != primaryAuthorTop.end(); ++it) {
-        squareSum += (it->second - otherAuthorTop[it->first]) * (it->second - otherAuthorTop[it->first]);
-    }
-    for(map<int, int>::iterator it = otherAuthorTop.begin(); it != otherAuthorTop.end(); ++it) {
-        if(primaryAuthorTop.find(it->first) == primaryAuthorTop.end()) {
-            squareSum += (it->second - primaryAuthorTop[it->first]) * (it->second - primaryAuthorTop[it->first]);
-        }
-    }
 
-    return 1 - ((double)(6 * squareSum) / (impliedAuthors.size() * impliedAuthors.size() - 1));
+    for(set<int>::iterator it = impliedAuthors.begin(); it != impliedAuthors.end(); ++it) {
+        int primaryFactor = primaryAuthorRank.find(*it) != primaryAuthorRank.end() ? primaryAuthorRank[*it] : primaryBiggestRank;
+        int otherFactor = otherAuthorRank.find(*it) != otherAuthorRank.end() ? otherAuthorRank[*it] : otherBiggestRank;
+        cout << "Spearman " << " " << *it << " primary: " << primaryFactor << ", " << other.getUsername() << ": ";
+        cout << otherFactor << '\n';
+        squareSum += (primaryFactor - otherFactor) * (primaryFactor - otherFactor);
+    }
+    cout << "Square sum: " << squareSum << "\nn is: " << impliedAuthors.size() << '\n';
+    return 1 - ((double)(6 * squareSum) / (impliedAuthors.size() * (impliedAuthors.size() * impliedAuthors.size() - 1)));
 }
 
 double Recommender::computeSpearmanDistance(Statistic primary, Statistic other) {
-    cout << primary.getUsername() << " " << other.getUsername() << '\n';
-    cout << (computeGenreSpearmanDistance(primary, other) + computeSubgenreSpearmanDistance(primary, other) +
-        computeAuthorSpearmanDistance(primary, other)) / 3 << '\n';
     return (computeGenreSpearmanDistance(primary, other) + computeSubgenreSpearmanDistance(primary, other) +
         computeAuthorSpearmanDistance(primary, other)) / 3;
 }
@@ -186,8 +207,9 @@ double Recommender::computeUserDistance(Statistic primary, Statistic other) {
 
 Recommender::Recommender(string username) {
     this->username = username;
-    Statistic aux(username);
-    primary = aux;
+    primary = Statistic(username);
+
+    map<string, int> hello = primary.getBookRates();
     list<string> otherUsers = DatabaseQueries::getOtherActiveUsers(username);
     //--------------------- debug-----------------------------------
     std::cout << "Active users: " << std::endl;
@@ -207,14 +229,8 @@ Recommender::Recommender(string username) {
     }
     // Now we have to fill the unreadRatedBooks member.
 
-    for(map<string, Statistic>::iterator it = otherStatistics.begin(); it != otherStatistics.end(); ++it) {
-        map<string, int> otherBookRates = it->second.getBookRates();
-        for(map<string, int>::iterator it2 = otherBookRates.begin(); it2 != otherBookRates.end(); ++it2) {
-            if(primary.getBookRates().find(it2->first) == primary.getBookRates().end()) {
-                unreadRatedBooks.insert(it2->first);
-            }
-        }
-    }
+    unreadRatedBooks = DatabaseQueries::getUnreadRatedBooks(username);
+
 }
 
 double Recommender::getAverageRate(Statistic stat) {
@@ -249,11 +265,13 @@ list<string> Recommender::recommendBooks() {
         double numerator = 0;
         for(map<string, double>::iterator it2 = userDistances.begin(); it2 != userDistances.end(); ++it2) {
             string otherUsername = it2->first;
-            if(otherStatistics[username].getBookRates().find(*it) != otherStatistics[username].getBookRates().end()) {
+            map<string, int> otherBookRates = otherStatistics[otherUsername].getBookRates();
+            if(otherBookRates.find(*it) != otherBookRates.end()) {
                 // if otherUser rated the book;
-                denominator += it2->second > 0 ? it2->second : (it2->second);
-                numerator += (it2->second) * (otherStatistics[username].getBookRates()[*it] -
-                                                getAverageRate(otherStatistics[username]));
+                denominator += it2->second > 0 ? it2->second : (-it2->second);
+                numerator += (it2->second) * (otherBookRates[*it] - getAverageRate(otherStatistics[otherUsername]));
+
+                cout << username << " " << it2->first << " distance is: " << it2->second << '\n';
             }
         }
         if(denominator != 0) {
@@ -265,16 +283,19 @@ list<string> Recommender::recommendBooks() {
     sort(bookByScores.begin(), bookByScores.end(), BookScore::comparator);
     list<string> result;
     for(int i = 0; i < bookByScores.size(); ++i) {
+        cout << "Selected: " << bookByScores[i].getBook() << " " << bookByScores[i].getScore() << '\n';
         if(bookByScores[i].getScore() > SCORE_THRESHOLD) {
             result.push_back(bookByScores[i].getBook());
         }
     }
 
+    cout << "Recommended books size: " << result.size() << '\n';
     if(result.size() < TOP_WANTED) {
         // we have to complete them
         list<string> completation = DatabaseQueries::getTopBooks(TOP_WANTED - result.size());
         for(list<string>::iterator it = completation.begin(); it != completation.end(); ++it) {
             result.push_back(*it);
+            cout << "From top: " << *it << '\n';
         }
     }
 

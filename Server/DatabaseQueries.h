@@ -8,6 +8,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <set>
 #include "sqlite3.h"
 #include <stdlib.h>
 #include "Book.h"
@@ -15,6 +16,7 @@
 #include "Creation.h"
 #include "Utility.h"
 #include "SearchInfo.h"
+#include "SerializerDeserializer.h"
 
 #define DATABASE "Books.db"
 #pragma once
@@ -55,6 +57,7 @@ public:
     static list<Book> getResponseToQuery(Book query);
     static void saveQuery(SearchInfo search);
     static list<string> getTopBooks(int top);
+    static set<string> getUnreadRatedBooks(string username);
     static list<Book> getBooksFromISBNList(list<string> ISBN);
     static map<string, int> getStringStatisticForUser(string username, string field);
     static map<int, int> getIntStatisticForUser(string username, string field);
@@ -619,6 +622,7 @@ list<string> DatabaseQueries::getTopBooks(int top) {
     auxStatement += ";";
 
     const char* statement = auxStatement.c_str();
+    cout << "Select TOP statement: " << statement << '\n';
 
     response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
     if (response != SQLITE_OK) {
@@ -627,9 +631,9 @@ list<string> DatabaseQueries::getTopBooks(int top) {
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
 
-        int length = sqlite3_column_bytes(stmt, 1);
+        int length = sqlite3_column_bytes(stmt, 0);
         if(length > 0) {
-            char* isbn = (char*)(sqlite3_column_text(stmt, 1));
+            char* isbn = (char*)(sqlite3_column_text(stmt, 0));
             cout << "Found adding isbn: " << isbn << '\n';
             result.push_back(string(isbn));
         }
@@ -725,6 +729,8 @@ map<string, int> DatabaseQueries::getBookRatesForUser(string username) {
     int response;
     sqlite3_stmt *stmt;
 
+    cout << "Database book rates query for " << username << '\n';
+
     /* Open database */
     response = sqlite3_open(DATABASE, &database);
     if(response){
@@ -751,7 +757,43 @@ map<string, int> DatabaseQueries::getBookRatesForUser(string username) {
     }
     sqlite3_finalize(stmt);
     sqlite3_close(database);
+    for(map<string, int>::iterator it = statistic.begin() ;it != statistic.end(); ++it) {
+        cout << "Final stat: " << it->first << ", " << it->second << '\n';
+    }
     return statistic;
+}
+
+set<string> DatabaseQueries::getUnreadRatedBooks(string username) {
+    set<string> books;
+    sqlite3* database;
+    int response;
+    sqlite3_stmt *stmt;
+
+    /* Open database */
+    response = sqlite3_open(DATABASE, &database);
+    if(response){
+        throw Utility::concatenateStrings("Can't open database: ", sqlite3_errmsg(database), "\n");
+    }
+    string auxStatement = "select distinct isbn from userRating where username !='";
+    auxStatement += username;
+    auxStatement += "';";
+    const char* statement = auxStatement.c_str();
+
+    response = sqlite3_prepare_v2(database, statement, -1, &stmt, NULL);
+    if (response != SQLITE_OK) {
+        throw Utility::concatenateStrings("SELECT unread rated books failed: ", sqlite3_errmsg(database), "\n");
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int length = sqlite3_column_bytes(stmt, 0);
+        if(length > 0) {
+            char* isbn = (char*)(sqlite3_column_text(stmt, 0));
+            books.insert(string(isbn));
+        }
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(database);
+    return books;
 }
 
 list<string> DatabaseQueries::getOtherActiveUsers(string username) {
