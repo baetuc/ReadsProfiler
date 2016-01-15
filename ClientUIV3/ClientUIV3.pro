@@ -47,4 +47,4 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     dialog.ui \
     search.ui \
-    view.ui
+    view.ui \

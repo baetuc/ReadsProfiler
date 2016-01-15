@@ -30,37 +30,27 @@ Search::Search(int sd, string username, QWidget *parent) :
     string serializedBooks = Reader::receiveMessageFromServer(sd, (MainWindow*)this->parent());
     list<Book> books = SerializerDeserializer::deserializeBookList(serializedBooks);
 
-    ui->tableWidget->insertRow(0);
     ui->tableWidget->setColumnCount(6);
     ui->tableWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     ui->tableWidget->setVisible(false);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
     ui->tableWidget->setVisible(true);
     ui->tableWidget->setHorizontalHeaderLabels(QString("ISBN;Titlu;Volum;Editura;Rating;Află mai multe").split(";"));
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
 
     int index = 0;
     for(list<Book>::iterator it = books.begin(); it != books.end(); ++it) {
         ui->tableWidget->insertRow(index);
-        QWidget* isbn = new QLabel(QString(it->getISBN().c_str()));
+        QWidget* isbn = new QLabel(QString(("         " + it->getISBN() + "       ").c_str()));
         QWidget* title = new QLabel(it->getCreation().getTitle().c_str());
         string volumeToFill = it->getCreation().getVolume() == 0 ? "-" :
                               Utility::getStringForNumber(it->getCreation().getVolume());
         QWidget* volume = new QLabel(volumeToFill.c_str());
-        QWidget* publisher = new QLabel(it->getPublisher().c_str());
+        QWidget* publisher = new QLabel(("  " + it->getPublisher() + "  ").c_str());
         list<Author> authors = it->getCreation().getAuthors();
         Book book = *it;
-        /*string auths;
-        for(list<Author>::iterator it = authors.begin(); it != authors.end(); ++it) {
-            auths += it->getSecondName();
-            auths += " ";
-            auths += it->getFirstName();
-            auths += ", ";
-        }
-        if(authors.size() > 0) {
-            auths = auths.substr(0, auths.size() - 2);
-        }
-        QWidget* author = new QLabel(auths.c_str());
-        */
+
         QWidget* rating = new QLabel(Utility::getStringForNumber(it->getRating()).c_str());
         QPushButton* pushButton = new QPushButton("Detalii");
         connect(pushButton,  &QPushButton::clicked, [=]{ viewButton(book, books); });
@@ -73,9 +63,8 @@ Search::Search(int sd, string username, QWidget *parent) :
         ui->tableWidget->setCellWidget(index, 5, pushButton);
         ++index;
     }
+    ui->tableWidget->resizeColumnsToContents();
 
-    ui->tableWidget->sortByColumn(4, Qt::DescendingOrder);
-    // sorts table in descending order after rating
 }
 
 Search::Search(list<Book> books, string username, QWidget* parent) :

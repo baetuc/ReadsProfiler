@@ -294,8 +294,17 @@ list<string> Recommender::recommendBooks() {
         // we have to complete them
         list<string> completation = DatabaseQueries::getTopBooks(TOP_WANTED - result.size());
         for(list<string>::iterator it = completation.begin(); it != completation.end(); ++it) {
-            result.push_back(*it);
-            cout << "From top: " << *it << '\n';
+            // verify if the book is already on the list
+            bool alreadyExists = false;
+            for(list<string>::iterator it2 = result.begin(); it2 != result.end(); ++it2) {
+                if(*it2 == *it) {
+                    alreadyExists = true;
+                }
+            }
+            if(!alreadyExists) {
+                result.push_back(*it);
+                cout << "From top: " << *it << '\n';
+            }
         }
     }
 

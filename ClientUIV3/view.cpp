@@ -72,7 +72,8 @@ View::View(Book book, list<Book> books, string username, QWidget *parent) :
     ui->isbn->setText(book.getISBN().c_str());
     ui->year->setText(Utility::getStringForNumber(book.getPublicationYear()).c_str());
     ui->rating->setText(Utility::getStringForFloat(book.getRating()).c_str());
-    //ui->description->setText(book.getDescription().c_str());
+    ui->description->clear();
+    ui->description->setPlainText(book.getDescription().c_str());
     ui->progressBar->setVisible(false); // will be visible only when download in progress
     ui->downloading->setVisible(false);
 }

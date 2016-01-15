@@ -169,6 +169,8 @@ string SerializerDeserializer::serializeBook(Book book) {
     serializedBook += ',';
 
     serializedBook += Utility::getStringForFloat(book.getRating());
+    serializedBook += ';';
+    serializedBook += book.getDescription();
 
     return serializedBook;
 }
@@ -200,9 +202,11 @@ Book SerializerDeserializer::deserializeBook(string serializedBook) {
     substrings = Utility::splitString(current, ',', 2);
     book.setPublicationYear((unsigned int)atoi(substrings[0].c_str()));
     current = substrings[1];
+    substrings = Utility::splitString(current, ';', 2);
 
     // Get the rating
-    book.setRating((float)atof(current.c_str()));
+    book.setRating((float)atof(substrings[0].c_str()));
+    book.setDescription(substrings[1]);
     return book;
 }
 

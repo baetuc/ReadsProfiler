@@ -12,6 +12,7 @@ private:
     string publisher;
     unsigned int publicationYear;
     float rating;
+    string description;
 
 public:
     Creation getCreation();
@@ -19,10 +20,12 @@ public:
     string getPublisher();
     unsigned int getPublicationYear();
     float getRating();
+    string getDescription();
 
     void setCreation(Creation creation);
     void setISBN(string ISBN);
     void setPublisher(string publisher);
     void setPublicationYear(unsigned int publicationYear);
     void setRating(float rating);
+    void setDescription(string);
 };

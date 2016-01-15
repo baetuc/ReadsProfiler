@@ -391,6 +391,7 @@ Book DatabaseQueries::getBookFromISBN(string ISBN, sqlite3* database) {
     book.setPublisher(getStringFromISBN(ISBN, database, "publisher"));
     book.setPublicationYear((unsigned int) getIntFromISBN(ISBN, database, "publicationYear"));
     book.setRating(getRatingFromISBN(ISBN, database));
+    book.setDescription(getStringFromISBN(ISBN, database, "description"));
 
     return book;
 }

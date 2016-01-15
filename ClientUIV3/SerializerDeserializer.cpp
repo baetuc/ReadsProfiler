@@ -141,6 +141,8 @@ string SerializerDeserializer::serializeBook(Book book) {
     serializedBook += ',';
 
     serializedBook += Utility::getStringForFloat(book.getRating());
+    serializedBook += ';';
+    serializedBook += book.getDescription();
 
     return serializedBook;
 }
@@ -149,11 +151,13 @@ Book SerializerDeserializer::deserializeBook(string serializedBook) {
     Book book;
     vector<string> substrings;
     string current;
+
     substrings = Utility::splitString(serializedBook, '#', 2);
 
     //First part is the serialized creation.
     book.setCreation(deserializeCreation(substrings[0]));
     current = substrings[1];
+
     // Split by comma, to get the length of the ISBN
     substrings = Utility::splitString(current, ',', 2);
     int substringLength = atoi(substrings[0].c_str());
@@ -165,15 +169,16 @@ Book SerializerDeserializer::deserializeBook(string serializedBook) {
     substringLength = atoi(substrings[0].c_str());
     book.setPublisher(substrings[1].substr(0, substringLength));
     current = substrings[1].substr(substringLength, string::npos);
-
     // Get the publication year
+
     substrings = Utility::splitString(current, ',', 2);
     book.setPublicationYear((unsigned int)atoi(substrings[0].c_str()));
     current = substrings[1];
+    substrings = Utility::splitString(current, ';', 2);
 
     // Get the rating
-    book.setRating((float)atof(current.c_str()));
-
+    book.setRating((float)atof(substrings[0].c_str()));
+    book.setDescription(substrings[1]);
     return book;
 }
 

@@ -61,10 +61,15 @@ void Dialog::on_cauta_clicked() {
        for(int i = 0; i < genress.size(); ++i) {
            genres.push_back(genress[i]);
        }
+       list<string> subgenres;
+       vector<string> subgenress= Utility::splitString(ui->subgenuri->text().toStdString(), ',', 0);
+       for(int i = 0; i < subgenress.size(); ++i) {
+           subgenres.push_back(subgenress[i]);
+       }
+       creation.setSubgenres(subgenres);
        creation.setGenres(genres);
        creation.setTitle(ui->titlu->text().toStdString());
        book.setCreation(creation);
-       book.setISBN(ui->isbn->text().toStdString());
        book.setPublicationYear(atoi(ui->an->text().toStdString().c_str()));
        book.setPublisher(ui->editura->text().toStdString());
        book.setRating(atoi(ui->rating->text().toStdString().c_str()));

@@ -115,7 +115,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="subgenuri">
+  <widget class="QLineEdit" name="isbn">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -168,7 +168,7 @@
     <rect>
      <x>80</x>
      <y>430</y>
-     <width>91</width>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -178,7 +178,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Subgenuri:</string>
+    <string>ISBN:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_6">
@@ -297,7 +297,7 @@
     <string>Editura:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="volum">
+  <widget class="QLineEdit" name="rating_2">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -307,7 +307,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_10">
+  <widget class="QLabel" name="volum">
    <property name="geometry">
     <rect>
      <x>80</x>
